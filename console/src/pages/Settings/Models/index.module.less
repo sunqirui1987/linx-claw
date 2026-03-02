@@ -1,0 +1,491 @@
+.page {
+  padding: 24px;
+}
+
+.loading {
+  text-align: center;
+  padding: 60px;
+}
+
+.loadingText {
+  color: @text-secondary;
+}
+
+/* ---- Sections ---- */
+
+.section {
+  margin-bottom: 32px;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.sectionTitle {
+  margin-bottom: 4px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.sectionDesc {
+  margin: 0 0 16px;
+  color: @text-secondary;
+  font-size: 14px;
+}
+
+/* ---- Model Square (七牛模型广场) ---- */
+
+.modelSquare {
+  margin-top: 16px;
+}
+
+.modelSquareGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.modelSquareCard {
+  background: @card-bg;
+  border: 1px solid @border-color;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  &:hover {
+    border-color: @border-color-secondary;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  }
+
+  &.modelSquareCardActive {
+    border-color: @color-primary;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.modelSquareCardBody {
+  flex: 1;
+  min-height: 0;
+}
+
+.modelSquareCardName {
+  font-size: 16px;
+  font-weight: 600;
+  color: @text-primary;
+  margin-bottom: 4px;
+}
+
+.modelSquareCardId {
+  font-size: 12px;
+  color: @text-secondary;
+  font-family: "SF Mono", "Menlo", monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.modelSquareCardActions {
+  flex-shrink: 0;
+}
+
+.modelSquareEmpty {
+  margin-top: 24px;
+  padding: 48px 24px;
+  text-align: center;
+  background: @disabled-bg;
+  border: 1px dashed @border-color;
+  border-radius: 12px;
+
+  .modelSquareEmptyText {
+    color: @text-secondary;
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+}
+
+/* ---- Providers Block (LLM below, providers below) ---- */
+
+.providersBlock {
+  margin-top: 32px;
+}
+
+/* ---- Provider Groups ---- */
+
+.providerGroup {
+  margin-bottom: 24px;
+
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+}
+
+.providerGroupTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: @text-tertiary;
+  margin: 0 0 12px;
+  letter-spacing: 0.02em;
+}
+
+/* ---- Provider Cards ---- */
+
+.providerCards {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+.providerCard {
+  flex: 1 1 calc(33.333% - 16px);
+  min-width: 280px;
+  border-radius: 16px;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  position: relative;
+  overflow: visible;
+  background: @card-bg;
+  display: flex;
+  flex-direction: column;
+
+  &.enabledCard {
+    border: 2px solid @color-primary !important;
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 8px 24px !important;
+  }
+
+  &.hover {
+    border: 1px solid @color-primary;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  }
+
+  &.normal {
+    border: 1px solid @border-color;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  :global(.ant-card-body) {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    height: 100%;
+  }
+}
+
+.statusContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .statusText {
+    font-size: 12px;
+    font-weight: 500;
+
+    &.enabled {
+      color: @color-success;
+    }
+
+    &.disabled {
+      color: @text-secondary;
+    }
+  }
+}
+
+.cardBody {
+  padding: 20px 24px;
+}
+
+.cardHeader {
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  :global {
+    .ant-badge-status-success .ant-badge-status-text {
+      color: #404040 !important;
+    }
+
+    .ant-badge-status-error .ant-badge-status-text {
+      color: #1a1a1a !important;
+    }
+  }
+}
+
+.cardName {
+  font-size: 18px;
+  font-weight: 600;
+  color: @text-primary;
+}
+
+.cardInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+  min-height: 66px;
+}
+
+.infoRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: @text-tertiary;
+}
+
+.infoLabel {
+  color: @text-secondary;
+  min-width: 70px;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.infoValue {
+  color: @text-primary;
+  font-family: "SF Mono", "Menlo", monospace;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+  max-width: calc(100% - 80px);
+  text-align: left;
+}
+
+.infoEmpty {
+  color: @text-tertiary;
+  font-style: italic;
+}
+
+.cardActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid @border-color;
+}
+
+.configBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 14px;
+  color: @text-tertiary;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* ---- Modal Footer ---- */
+
+.modalFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modalFooterLeft {
+  display: flex;
+  align-items: center;
+}
+
+.modalFooterRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ---- Model Slot Sections ---- */
+
+.slotSection {
+  padding: 24px;
+  background: @card-bg;
+  border-radius: 16px;
+  border: 1px solid @border-color;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    border-color: @border-color-secondary;
+  }
+}
+
+.slotHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid @border-color;
+}
+
+.slotTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: @text-primary;
+}
+
+.slotCurrent {
+  font-size: 13px;
+  color: @color-success;
+  font-family: "SF Mono", "Menlo", monospace;
+  background: rgba(0, 0, 0, 0.06);
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.slotForm {
+  display: flex;
+  gap: 20px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+}
+
+.slotField {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 200px;
+
+  @media (max-width: 768px) {
+    min-width: unset;
+    width: 100%;
+  }
+}
+
+.slotLabel {
+  font-size: 14px;
+  color: @text-tertiary;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.slotProviderFixed {
+  padding: 8px 12px;
+  background: @disabled-bg;
+  border: 1px solid @border-color;
+  border-radius: 8px;
+  font-size: 14px;
+  color: @text-primary;
+}
+
+.slotActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid @border-color;
+}
+
+/* ---- Section Header Row (title + button) ---- */
+
+.sectionHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 0;
+
+  .section {
+    flex: 1;
+    margin-bottom: 0;
+  }
+}
+
+.addProviderBtn {
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+/* ---- Model Management Modal ---- */
+
+.modelList {
+  max-height: 360px;
+  overflow-y: auto;
+  border: 1px solid @border-color;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+.modelListEmpty {
+  padding: 24px;
+  text-align: center;
+  color: @text-secondary;
+  font-size: 13px;
+}
+
+.modelListItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid @border-color;
+  transition: background 0.15s;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: @card-hover-bg;
+  }
+}
+
+.modelListItemInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.modelListItemName {
+  font-size: 14px;
+  font-weight: 500;
+  color: @text-primary;
+}
+
+.modelListItemId {
+  font-size: 12px;
+  color: @text-secondary;
+  font-family: "SF Mono", "Menlo", monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.modelListItemActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+.modelAddForm {
+  margin-top: 12px;
+  padding: 16px;
+  background: @disabled-bg;
+  border-radius: 8px;
+  border: 1px dashed @border-color;
+}

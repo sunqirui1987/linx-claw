@@ -1,0 +1,39 @@
+{
+  "providers": {
+    "modelscope": {
+      "base_url": "https://api-inference.modelscope.cn/v1",
+      "api_key": "",
+      "extra_models": [],
+      "chat_model": ""
+    },
+    "dashscope": {
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "api_key": "",
+      "extra_models": [],
+      "chat_model": ""
+    },
+    "aliyun-codingplan": {
+      "base_url": "https://coding.dashscope.aliyuncs.com/v1",
+      "api_key": "",
+      "extra_models": [],
+      "chat_model": ""
+    },
+    "qnaigc": {
+      "base_url": "https://api.qnaigc.com/v1",
+      "api_key": "",
+      "extra_models": [],
+      "chat_model": ""
+    },
+    "ollama": {
+      "base_url": "http://localhost:11434/v1",
+      "api_key": "",
+      "extra_models": [],
+      "chat_model": ""
+    }
+  },
+  "custom_providers": {},
+  "active_llm": {
+    "provider_id": "",
+    "model": ""
+  }
+}

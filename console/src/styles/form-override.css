@@ -1,0 +1,15 @@
+/**
+ * Form required mark style protection
+ * Prevent CSS-in-JS styles from third-party components (e.g., @agentscope-ai/chat) from overriding
+ */
+
+/* Protect required asterisk for Ant Design form required marks (B&W theme) */
+.ant-form-item-required::before {
+  color: #1a1a1a !important;
+}
+
+/* Protect custom required mark span elements (e.g., spark-required-mark) */
+span.spark-required-mark,
+span[class*="spark-required-mark"] {
+  color: #1a1a1a !important;
+}

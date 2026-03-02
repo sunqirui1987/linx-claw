@@ -1,0 +1,350 @@
+.page {
+  padding: 24px;
+}
+
+/* ---- Section (matches Models page) ---- */
+
+.section {
+  margin-bottom: 24px;
+}
+
+.sectionTitle {
+  margin-bottom: 4px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.sectionDesc {
+  margin: 0;
+  color: @text-secondary;
+  font-size: 14px;
+}
+
+/* ---- Loading / Error ---- */
+
+.centerState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+}
+
+.stateText {
+  font-size: 14px;
+  color: @text-secondary;
+}
+
+.stateTextError {
+  font-size: 14px;
+  color: @color-error;
+  margin-bottom: 4px;
+}
+
+/* ---- Table card ---- */
+
+.tableCard {
+  background: @card-bg;
+  border: 1px solid @border-color;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    border-color: @border-color-secondary;
+  }
+}
+
+/* ---- Toolbar ---- */
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: @bg-elevated;
+  border-bottom: 1px solid @border-color;
+  transition: background 0.2s ease-in-out;
+
+  &:hover {
+    background: @card-hover-bg;
+  }
+}
+
+.toolbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toolbarCount {
+  font-size: 13px;
+  color: @text-secondary;
+  user-select: none;
+}
+
+.toolbarRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ---- Row list ---- */
+
+.rowList {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- Env row ---- */
+
+.envRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 24px;
+  border-bottom: 1px solid @border-color;
+  transition: all 0.2s ease-in-out;
+  flex-wrap: wrap;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: @card-hover-bg;
+    transform: translateX(2px);
+  }
+}
+
+.envRowSelected {
+  background: rgba(0, 0, 0, 0.06);
+  border-left: 3px solid @color-primary;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.08);
+    transform: translateX(2px);
+  }
+}
+
+.rowCheckbox {
+  flex-shrink: 0;
+}
+
+/* Key + Value inputs side-by-side */
+
+.fieldsWrap {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  gap: 16px;
+}
+
+.inputGroup {
+  display: flex;
+  align-items: center;
+  flex: 1 1 0;
+  min-width: 180px;
+  height: 42px;
+  border: 1px solid @border-color;
+  border-radius: 8px;
+  background: @input-bg;
+  overflow: hidden;
+  transition: all 0.2s ease-in-out;
+
+  &:focus-within {
+    border-color: @color-primary;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+  }
+}
+
+.inputGroupError {
+  border-color: @color-error;
+  animation: shake 0.3s ease-in-out;
+
+  &:focus-within {
+    border-color: @color-error;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.15);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-2px);
+  }
+
+  75% {
+    transform: translateX(2px);
+  }
+}
+
+.inputLabel {
+  flex-shrink: 0;
+  padding: 0 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: @text-tertiary;
+  white-space: nowrap;
+  user-select: none;
+  line-height: 42px;
+  border-right: 1px solid @border-color;
+  background: @disabled-bg;
+  min-width: 60px;
+  text-align: center;
+  transition: all 0.2s ease-in-out;
+
+  .inputGroup:focus-within & {
+    color: @color-primary;
+    background: rgba(0, 0, 0, 0.06);
+  }
+}
+
+.inputField {
+  flex: 1;
+  min-width: 0;
+  height: 40px !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  font-family: "SF Mono", "Menlo", "Consolas", monospace;
+  font-size: 14px;
+  background: transparent;
+  padding-left: 12px;
+  transition: all 0.2s ease-in-out;
+
+  &::placeholder {
+    color: #bfbfbf;
+  }
+}
+
+.inputField {
+  :global(.ant-input) {
+    height: 40px !important;
+    border: none !important;
+    box-shadow: none !important;
+    font-family: "SF Mono", "Menlo", "Consolas", monospace;
+    font-size: 14px;
+    padding-left: 12px;
+    transition: all 0.2s ease-in-out;
+
+    &::placeholder {
+      color: #bfbfbf;
+    }
+  }
+}
+
+/* ---- Row action buttons ---- */
+
+.rowActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.rowIconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  color: @text-tertiary;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    color: @color-primary;
+    background: rgba(0, 0, 0, 0.06);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.rowIconBtnDanger {
+  &:hover {
+    color: @color-error;
+    background: rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+}
+
+/* ---- Row error ---- */
+
+.rowError {
+  flex-basis: 100%;
+  font-size: 12px;
+  color: @color-error;
+  padding-left: 36px;
+  /* align with fields after checkbox */
+  margin-top: -2px;
+}
+
+/* ---- Add bar ---- */
+
+.addBar {
+  display: flex;
+  padding: 16px 24px;
+  border-top: 1px solid @border-color;
+  background: @bg-elevated;
+  transition: background 0.2s ease-in-out;
+
+  &:hover {
+    background: @card-hover-bg;
+  }
+}
+
+.addBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  border: 1px dashed @border-color;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  color: @text-secondary;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    color: @color-primary;
+    border-color: @color-primary;
+    background: rgba(0, 0, 0, 0.06);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  svg {
+    font-size: 16px;
+  }
+}
+
+/* ---- Empty state ---- */
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 48px 24px;
+  color: @text-tertiary;
+  font-size: 14px;
+}
+
+.emptyIcon {
+  font-size: 32px;
+  opacity: 0.6;
+}

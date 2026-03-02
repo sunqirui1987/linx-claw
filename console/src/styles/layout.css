@@ -1,0 +1,99 @@
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  background: #f5f5f5;
+}
+
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+
+.ant-layout {
+  min-height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  background: #f5f5f5;
+}
+
+.ant-layout-content {
+  overflow: hidden;
+  background: #f5f5f5;
+}
+
+.page-container {
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-header {
+  flex: 0 0 auto;
+}
+
+.page-content {
+  flex: 1 1 auto;
+  overflow: auto;
+  padding: 0 24px 24px 24px;
+}
+
+/* Light theme scrollbar */
+.page-content::-webkit-scrollbar,
+.table-wrapper::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.page-content::-webkit-scrollbar-track,
+.table-wrapper::-webkit-scrollbar-track {
+  background: #e8e8e8;
+}
+
+.page-content::-webkit-scrollbar-thumb,
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: #bfbfbf;
+  border-radius: 4px;
+}
+
+.page-content::-webkit-scrollbar-thumb:hover,
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #8c8c8c;
+}
+
+.table-container {
+  height: 100%;
+  overflow: hidden;
+}
+
+.table-wrapper {
+  height: 100%;
+  overflow: auto;
+}
+
+/* .ant-card {
+  height: 100%;
+} */
+
+.ant-card-body {
+  height: 100%;
+  padding: 0;
+}
+
+/* Welcome avatar: full tall SVG. Class is Aicraw-avatar (no "ant"). */
+[class*="chat-anywhere-welcome-default"] [class*="-avatar"],
+[class*="message-list-welcome"] [class*="welcome-default"] [class*="-avatar"] {
+  width: 36px !important;
+  height: 48px !important;
+  min-width: 36px !important;
+  min-height: 48px !important;
+  overflow: visible !important;
+}
+[class*="chat-anywhere-welcome-default"] [class*="-avatar"] > img,
+[class*="message-list-welcome"] [class*="-avatar"] > img {
+  object-fit: contain !important;
+  object-position: center;
+}
