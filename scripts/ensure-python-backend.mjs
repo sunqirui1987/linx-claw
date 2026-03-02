@@ -45,7 +45,9 @@ rmSync(consoleDest, { recursive: true, force: true })
 cpSync(join(consoleDir, 'dist'), consoleDest, { recursive: true })
 
 // 2. Run PyInstaller (使用 electron spec，无需 pywebview)
-const pipInstall = spawnSync('pip', ['install', '-q', 'pyinstaller', '.'], {
+// 使用 python -m pip 确保与运行环境一致，不加 -q 以便失败时看到详细错误
+const pythonCmd = process.platform === 'win32' ? 'python' : 'python3'
+const pipInstall = spawnSync(pythonCmd, ['-m', 'pip', 'install', 'pyinstaller', '.'], {
   cwd: repoRoot,
   stdio: 'inherit',
 })
@@ -55,7 +57,7 @@ if (pipInstall.status !== 0) {
 }
 
 const specPath = join(repoRoot, 'packaging', 'aicraw_electron.spec')
-const pyinstaller = spawnSync('pyinstaller', [
+const pyinstaller = spawnSync(pythonCmd, ['-m', 'PyInstaller', 
   '--noconfirm',
   '--clean',
   '--distpath',
