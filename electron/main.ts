@@ -42,9 +42,11 @@ async function startPythonBackend(): Promise<boolean> {
   const exePath = getPythonExecutablePath()
   if (exePath) {
     console.log('[Aicraw] Starting bundled Python backend:', exePath)
+    const binDir = dirname(exePath)
     pythonProcess = spawn(exePath, [], {
       stdio: ['ignore', 'pipe', 'pipe'],
       env: { ...process.env },
+      cwd: binDir, // PyInstaller onedir 需在 exe 所在目录运行以加载 _internal
     })
     pythonProcess.stdout?.on('data', (d) => process.stdout.write(d.toString()))
     pythonProcess.stderr?.on('data', (d) => process.stderr.write(d.toString()))

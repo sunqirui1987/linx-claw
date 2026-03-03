@@ -24,6 +24,8 @@
   background: #ffffff;
   border-bottom: 1px solid #e0e0e0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  -webkit-app-region: drag;
+  app-region: drag;
 }
 
 .headerLeft {
@@ -59,6 +61,8 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
 
   &:hover {
     background: #f5f5f5;
@@ -131,6 +135,8 @@
   cursor: pointer;
   transition: all 0.2s;
   text-align: left;
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
 
   &:hover {
     background: #fafafa;
@@ -148,6 +154,8 @@
 
 .headerRight {
   flex-shrink: 0;
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
 }
 
 .consoleContent {

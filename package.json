@@ -14,9 +14,9 @@
   "scripts": {
     "dev:electron": "vite build --config vite.electron.config.ts && electron .",
     "build:python": "node scripts/ensure-python-backend.mjs --force",
-    "build:electron": "node scripts/check-python-dist.mjs && vite build --config vite.electron.config.ts && electron-builder",
-    "build:electron:mac": "node scripts/check-python-dist.mjs && vite build --config vite.electron.config.ts && electron-builder --mac",
-    "build:electron:win": "node scripts/check-python-dist.mjs && vite build --config vite.electron.config.ts && electron-builder --win",
+    "build:electron": "node scripts/sync-icons.mjs && node scripts/check-python-dist.mjs && vite build --config vite.electron.config.ts && electron-builder",
+    "build:electron:mac": "node scripts/sync-icons.mjs && node scripts/check-python-dist.mjs && vite build --config vite.electron.config.ts && electron-builder --mac",
+    "build:electron:win": "node scripts/sync-icons.mjs && node scripts/check-python-dist.mjs && vite build --config vite.electron.config.ts && electron-builder --win",
     "postinstall": "electron-builder install-app-deps"
   },
   "devDependencies": {
@@ -48,12 +48,29 @@
     ],
     "mac": {
       "category": "public.app-category.productivity",
-      "target": ["dmg", "zip"],
-      "arch": ["x64", "arm64"]
+      "icon": "build/icon.icns",
+      "target": ["dmg"],
+      "defaultArch": "universal",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist"
+    },
+    "dmg": {
+      "sign": false,
+      "contents": [
+        { "x": 130, "y": 220 },
+        { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
+      ]
     },
     "win": {
+      "icon": "build/icon.ico",
       "target": ["nsis", "portable"],
-      "arch": ["x64"]
+      "defaultArch": "x64"
+    },
+    "linux": {
+      "icon": "build/icon.png",
+      "category": "Utility"
     },
     "nsis": {
       "oneClick": false,

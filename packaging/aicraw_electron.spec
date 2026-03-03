@@ -32,6 +32,8 @@ a = Analysis(
         "playwright.async_api",
         "agentscope",
         "agentscope_runtime",
+        "click",
+        "click.testing",
     ],
     hookspath=[],
     hooksconfig={},

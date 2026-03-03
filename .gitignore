@@ -1,5 +1,6 @@
 electron/node_modules
 python-dist/
+.build-venv/
 release/
 __pycache__
 src/aicraw/agents/__pycache__
@@ -10,3 +11,5 @@ dist
 dist-electron
 logs
 node_modules
+build
+src/aicraw/console

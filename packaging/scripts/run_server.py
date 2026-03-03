@@ -18,6 +18,15 @@ def _ensure_init() -> bool:
     if get_config_path().is_file():
         return True
     try:
+        if getattr(sys, "frozen", False):
+            # PyInstaller 打包：无系统 Python，直接调用 init 逻辑
+            from click.testing import CliRunner
+
+            from aicraw.cli.init_cmd import init_cmd
+
+            runner = CliRunner()
+            result = runner.invoke(init_cmd, ["--defaults", "--accept-security"])
+            return result.exit_code == 0
         subprocess.run(
             [sys.executable, "-m", "aicraw", "init", "--defaults", "--accept-security"],
             check=True,
@@ -38,6 +47,15 @@ def main() -> None:
     write_last_api(HOST, PORT)
 
     import uvicorn
+
+    # Pre-import to surface traceback if module fails to load (e.g. in PyInstaller bundle)
+    try:
+        import importlib
+        importlib.import_module("aicraw.app._app")
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
 
     uvicorn.run(
         "aicraw.app._app:app",
