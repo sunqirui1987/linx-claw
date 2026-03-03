@@ -51,54 +51,64 @@ xcrun notarytool store-credentials "AC_PASSWORD" \
 
 ---
 
-## 三、修改 package.json
+## 三、package.json 配置
 
-### 3.1 mac 签名与公证
+### 3.1 mac 签名配置（已预置）
 
-在 `build.mac` 中增加（替换 `YOUR_TEAM_ID` 和证书名称）：
+`package.json` 中 `build.mac` 已配置好 Hardened Runtime 和 entitlements：
 
 ```json
 "mac": {
-  "identity": "Developer ID Application: Your Name (YOUR_TEAM_ID)",
-  "notarize": {
-    "teamId": "YOUR_TEAM_ID"
-  }
+  "hardenedRuntime": true,
+  "entitlements": "build/entitlements.mac.plist",
+  "entitlementsInherit": "build/entitlements.mac.plist",
+  "notarize": false
 }
 ```
 
-- `identity`：必须与钥匙串中的证书名称完全一致
-- `notarize.teamId`：10 位 Team ID
-- 当前配置使用 `defaultArch: "universal"`，输出 universal 包（Intel + Apple Silicon）
+- `notarize: false`：本地开发默认不公证，CI 通过命令行参数覆盖
 
-### 3.2 DMG 签名（可选）
+### 3.2 本地打包（有证书）
 
-配置证书后，建议对 DMG 也签名，使安装包本身带证书。在 `build` 中修改 `dmg`：
+```bash
+# 1. 确保证书已在钥匙串中
+security find-identity -v -p codesigning
 
-```json
-"dmg": {
-  "sign": true,
-  "contents": [
-    { "x": 130, "y": 220 },
-    { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
-  ]
-}
+# 2. 通过命令行传入 Team ID 启用公证
+APPLE_ID="your@email.com" \
+APPLE_APP_SPECIFIC_PASSWORD="xxxx-xxxx-xxxx-xxxx" \
+pnpm exec electron-builder --mac --arm64 \
+  --config.mac.notarize.teamId=YOUR_TEAM_ID
 ```
 
-- `sign: true`：使用与 `mac.identity` 相同的证书对 DMG 签名
-- `contents`：DMG 窗口布局（应用图标与 Applications 链接位置），参考 qiniu-aistudio
+### 3.3 CI 自动签名（GitHub Actions）
+
+在仓库 **Settings → Secrets → Actions** 中添加：
+
+| Secret 名称 | 说明 |
+|-------------|------|
+| `APPLE_CERT_P12_BASE64` | `base64 -i cert.p12 \| pbcopy` 得到的字符串 |
+| `APPLE_CERT_PASSWORD` | P12 文件密码 |
+| `APPLE_ID` | Apple ID 邮箱 |
+| `APPLE_APP_PASSWORD` | App 专用密码 |
+| `APPLE_TEAM_ID` | 10 位 Team ID |
+
+推送 `v*` 标签后，`.github/workflows/release.yml` 自动完成：签名 → 公证 → 上传 Release。
 
 ---
 
 ## 四、打包流程
 
 ```bash
+# 本地打包（无签名）
 pnpm run build:python
-pnpm run build:electron:mac
+pnpm run build:electron:mac:arm64   # M 芯片 Mac 上运行
+pnpm run build:electron:mac:x64    # Intel Mac 上运行
 ```
 
-打包时会自动完成：签名 → 公证（约 5–15 分钟）→ 输出到 `release/`。
-
-输出文件：`release/Aicraw-<版本>-universal.dmg`。
+输出文件：
+- `release/Aicraw-<版本>-arm64.dmg` — Apple Silicon 版
+- `release/Aicraw-<版本>.dmg` — Intel 版
 
 ---
 

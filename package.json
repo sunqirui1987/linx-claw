@@ -16,13 +16,15 @@
     "build:python": "node scripts/ensure-python-backend.mjs --force",
     "build:electron": "node scripts/sync-icons.mjs && node scripts/check-python-dist.mjs && vite build --config vite.electron.config.ts && electron-builder",
     "build:electron:mac": "node scripts/sync-icons.mjs && node scripts/check-python-dist.mjs && vite build --config vite.electron.config.ts && electron-builder --mac",
+    "build:electron:mac:arm64": "node scripts/sync-icons.mjs && node scripts/check-python-dist.mjs && vite build --config vite.electron.config.ts && electron-builder --mac --arm64",
+    "build:electron:mac:x64": "node scripts/sync-icons.mjs && node scripts/check-python-dist.mjs && vite build --config vite.electron.config.ts && electron-builder --mac --x64",
     "build:electron:win": "node scripts/sync-icons.mjs && node scripts/check-python-dist.mjs && vite build --config vite.electron.config.ts && electron-builder --win",
     "postinstall": "electron-builder install-app-deps"
   },
   "devDependencies": {
     "@electron-toolkit/utils": "^4.0.0",
     "electron": "^31.0.0",
-    "electron-builder": "^24.13.3",
+    "electron-builder": "^25.0.0",
     "typescript": "~5.8.3",
     "vite": "^6.3.5",
     "vite-plugin-electron": "^0.28.8"
@@ -49,12 +51,14 @@
     "mac": {
       "category": "public.app-category.productivity",
       "icon": "build/icon.icns",
-      "target": ["dmg"],
-      "defaultArch": "universal",
+      "target": [
+        { "target": "dmg", "arch": ["arm64", "x64"] }
+      ],
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "entitlements": "build/entitlements.mac.plist",
-      "entitlementsInherit": "build/entitlements.mac.plist"
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "notarize": false
     },
     "dmg": {
       "sign": false,
@@ -65,12 +69,10 @@
     },
     "win": {
       "icon": "build/icon.ico",
-      "target": ["nsis", "portable"],
-      "defaultArch": "x64"
-    },
-    "linux": {
-      "icon": "build/icon.png",
-      "category": "Utility"
+      "target": [
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
+      ]
     },
     "nsis": {
       "oneClick": false,
