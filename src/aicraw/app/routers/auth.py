@@ -5,6 +5,7 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
 import logging
+import ssl
 from typing import Any
 
 from fastapi import APIRouter, HTTPException
@@ -42,10 +43,13 @@ async def _validate_qnaigc_api_key(api_key: str) -> bool:
     """Validate API key via qnaigc usage endpoint."""
     try:
         import aiohttp
+        import certifi
 
         start, end = _usage_window_rfc3339()
         timeout = aiohttp.ClientTimeout(total=10)
-        async with aiohttp.ClientSession(timeout=timeout) as session:
+        ssl_ctx = ssl.create_default_context(cafile=certifi.where())
+        connector = aiohttp.TCPConnector(ssl=ssl_ctx)
+        async with aiohttp.ClientSession(timeout=timeout, connector=connector) as session:
             async with session.get(
                 QNAIGC_USAGE_URL,
                 params={
