@@ -48,17 +48,16 @@ def main() -> None:
 
     import uvicorn
 
-    # Pre-import to surface traceback if module fails to load (e.g. in PyInstaller bundle)
+    # Use static import so PyInstaller can collect aicraw.app package reliably.
     try:
-        import importlib
-        importlib.import_module("aicraw.app._app")
+        from aicraw.app._app import app as fastapi_app
     except Exception as e:
         import traceback
         traceback.print_exc()
         sys.exit(1)
 
     uvicorn.run(
-        "aicraw.app._app:app",
+        fastapi_app,
         host=HOST,
         port=PORT,
         reload=False,

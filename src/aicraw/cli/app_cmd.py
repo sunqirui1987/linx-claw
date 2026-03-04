@@ -59,7 +59,7 @@ def app_cmd(
     log_level: str,
     hide_access_paths: tuple[str, ...],
 ) -> None:
-    """Run Aicraw FastAPI app."""
+    """Run LinClaw FastAPI app."""
     # Persist last used host/port for other terminals
     write_last_api(host, port)
     os.environ[LOG_LEVEL_ENV] = log_level

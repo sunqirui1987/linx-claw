@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run Aicraw with Electron (spawns Python aicraw app).
+# Run LinClaw with Electron (spawns Python aicraw app).
 # Run from repo root: bash scripts/electron_run.sh
 #
 # Prerequisites:

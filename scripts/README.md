@@ -16,4 +16,4 @@ bash scripts/wheel_build.sh
 bash scripts/desktop_build.sh
 ```
 
-- Builds the console frontend, copies to `src/aicraw/console/`, then runs PyInstaller. Output: `dist/Aicraw/`.
+- Builds the console frontend, copies to `src/aicraw/console/`, then runs PyInstaller. Output: `dist/LinClaw/`.

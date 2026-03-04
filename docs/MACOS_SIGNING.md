@@ -107,8 +107,8 @@ pnpm run build:electron:mac:x64    # Intel Mac 上运行
 ```
 
 输出文件：
-- `release/Aicraw-<版本>-arm64.dmg` — Apple Silicon 版
-- `release/Aicraw-<版本>.dmg` — Intel 版
+- `release/LinClaw-<版本>-arm64.dmg` — Apple Silicon 版
+- `release/LinClaw-<版本>.dmg` — Intel 版
 
 ---
 
@@ -117,10 +117,10 @@ pnpm run build:electron:mac:x64    # Intel Mac 上运行
 ```bash
 # 从 DMG 安装后，或解压 release 中的 mac-universal 目录
 # 验证签名
-codesign -dvv /Applications/Aicraw.app
+codesign -dvv /Applications/LinClaw.app
 
 # 验证公证
-spctl -a -vv -t install /Applications/Aicraw.app
+spctl -a -vv -t install /Applications/LinClaw.app
 # 应显示：source=Notarized Developer ID
 ```
 
