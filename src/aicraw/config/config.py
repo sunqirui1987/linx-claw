@@ -247,6 +247,8 @@ class Config(BaseModel):
     last_dispatch: Optional[LastDispatchConfig] = None
     # When False, channel output hides tool call/result details (show "...").
     show_tool_details: bool = True
+    # API key for /v1/chat/completions (Bearer auth). Empty = endpoint disabled.
+    openai_api_key: str = Field(default="", description="OpenAI API key for /v1/chat/completions")
 
 
 ChannelConfigUnion = Union[

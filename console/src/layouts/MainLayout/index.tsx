@@ -13,6 +13,7 @@ import WorkspacePage from "../../pages/Agent/Workspace";
 import MCPPage from "../../pages/Agent/MCP";
 import ModelsPage from "../../pages/Settings/Models";
 import GeneralConfigPage from "../../pages/Settings/GeneralConfig";
+import ServiceCapabilitiesPage from "../../pages/Settings/ServiceCapabilities";
 import EnvironmentsPage from "../../pages/Settings/Environments";
 import { useAuthStore, type AuthState } from "../../stores/auth";
 
@@ -71,6 +72,7 @@ export default function MainLayout() {
         <Route path="/workspace" element={<WorkspacePage />} />
         <Route path="/models" element={<ModelsPage />} />
         <Route path="/general-config" element={<GeneralConfigPage />} />
+        <Route path="/service-capabilities" element={<ServiceCapabilitiesPage />} />
         <Route path="/environments" element={<EnvironmentsPage />} />
         <Route path="/agent-config" element={<AgentConfigPage />} />
       </Routes>

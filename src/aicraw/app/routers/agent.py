@@ -18,7 +18,7 @@ from ...config.config import (
 
 from ...agents.memory.agent_md_manager import AGENT_MD_MANAGER
 from ...agents.utils import copy_md_files
-from ...providers import get_active_llm_config, load_providers_json
+from ...providers import get_active_llm_config, load_providers_json, mask_api_key
 
 router = APIRouter(prefix="/agent", tags=["agent"])
 
@@ -82,11 +82,12 @@ class HeartbeatConfigRequest(BaseModel):
 
 
 class DefaultsConfigResponse(BaseModel):
-    """Defaults config (heartbeat, show_tool_details, language)."""
+    """Defaults config (heartbeat, show_tool_details, language, openai_api_key)."""
 
     heartbeat: Optional[HeartbeatConfig] = None
     show_tool_details: bool = True
     language: str = "zh"
+    openai_api_key: str = ""
 
 
 class DefaultsConfigRequest(BaseModel):
@@ -95,6 +96,7 @@ class DefaultsConfigRequest(BaseModel):
     heartbeat: Optional[HeartbeatConfigRequest] = None
     show_tool_details: bool = True
     language: str = "zh"
+    openai_api_key: Optional[str] = None
 
 
 class InstallMdTemplatesRequest(BaseModel):
@@ -257,6 +259,7 @@ async def get_defaults_config() -> DefaultsConfigResponse:
         heartbeat=config.agents.defaults.heartbeat,
         show_tool_details=config.show_tool_details,
         language=config.agents.language,
+        openai_api_key=mask_api_key(getattr(config, "openai_api_key", "") or ""),
     )
 
 
@@ -289,11 +292,17 @@ async def put_defaults_config(
     config.show_tool_details = body.show_tool_details
     if body.language in ("zh", "en"):
         config.agents.language = body.language
+    if body.openai_api_key is not None:
+        val = body.openai_api_key or ""
+        # Skip update if value looks like masked (user did not change it)
+        if "*" not in val:
+            config.openai_api_key = val
     save_config(config)
     return DefaultsConfigResponse(
         heartbeat=config.agents.defaults.heartbeat,
         show_tool_details=config.show_tool_details,
         language=config.agents.language,
+        openai_api_key=mask_api_key(getattr(config, "openai_api_key", "") or ""),
     )
 
 

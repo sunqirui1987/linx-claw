@@ -19,6 +19,7 @@ import {
   Settings,
   Plug,
   SlidersHorizontal,
+  Server,
 } from "lucide-react";
 
 const { Sider } = Layout;
@@ -33,6 +34,7 @@ const keyToPath: Record<string, string> = {
   workspace: "/workspace",
   models: "/models",
   "general-config": "/general-config",
+  "service-capabilities": "/service-capabilities",
   environments: "/environments",
   "agent-config": "/agent-config",
 };
@@ -141,6 +143,11 @@ export default function Sidebar({
           key: "general-config",
           label: t("nav.generalConfig"),
           icon: <SlidersHorizontal size={16} />,
+        },
+        {
+          key: "service-capabilities",
+          label: t("nav.serviceCapabilities"),
+          icon: <Server size={16} />,
         },
         {
           key: "environments",

@@ -22,6 +22,7 @@ import {
   Box,
   SlidersHorizontal,
   Globe,
+  Server,
 } from "lucide-react";
 import api from "../api";
 import styles from "./ConsoleLayout.module.less";
@@ -37,6 +38,7 @@ const keyToPath: Record<string, string> = {
   "agent-config": "/agent-config",
   models: "/models",
   "general-config": "/general-config",
+  "service-capabilities": "/service-capabilities",
   environments: "/environments",
 };
 
@@ -50,6 +52,7 @@ const keyToLabel: Record<string, string> = {
   "agent-config": "nav.agentConfig",
   models: "nav.models",
   "general-config": "nav.generalConfig",
+  "service-capabilities": "nav.serviceCapabilities",
   environments: "nav.environments",
 };
 
@@ -82,6 +85,7 @@ const navGroups = [
     items: [
       { key: "models", icon: Box },
       { key: "general-config", icon: SlidersHorizontal },
+      { key: "service-capabilities", icon: Server },
       { key: "environments", icon: Globe },
     ],
   },
@@ -109,7 +113,12 @@ export default function ConsoleLayout({ children }: ConsoleLayoutProps) {
   }, []);
 
   useEffect(() => {
-    if (currentPath === "/models" || currentPath === "/general-config") return;
+    if (
+      currentPath === "/models" ||
+      currentPath === "/general-config" ||
+      currentPath === "/service-capabilities"
+    )
+      return;
     agentApi
       .getInitStatus()
       .then((res) => setShowInitModal(res.needs_init))

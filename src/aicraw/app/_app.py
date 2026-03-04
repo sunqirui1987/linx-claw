@@ -16,7 +16,7 @@ from ..config import (  # pylint: disable=no-name-in-module
     update_last_dispatch,
     ConfigWatcher,
 )
-from ..config.utils import get_jobs_path, get_chats_path, get_config_path
+from ..config.utils import get_jobs_path, get_chats_path, get_config_path, read_last_api
 from ..constant import CONSOLE_REQUIRE_AUTH, DOCS_ENABLED, LOG_LEVEL_ENV, CORS_ORIGINS
 from ..__version__ import __version__
 from ..utils.logging import setup_logger
@@ -28,6 +28,7 @@ from .crons.repo.json_repo import JsonJobRepository
 from .crons.manager import CronManager
 from .runner.manager import ChatManager
 from .routers import router as api_router
+from ..openai import router as openai_router
 from ..envs import load_envs_into_environ
 
 # Apply log level on load so reload child process gets same level as CLI.
@@ -153,7 +154,7 @@ if CONSOLE_REQUIRE_AUTH:
     async def _console_auth_middleware(request, call_next):
         path = request.url.path
         if path.startswith("/api/"):
-            if path in ("/api/auth/login", "/api/version"):
+            if path in ("/api/auth/login", "/api/version", "/api/server-info"):
                 return await call_next(request)
             auth = request.headers.get("Authorization")
             if not auth or not auth.startswith("Bearer ") or not auth[7:].strip():
@@ -218,7 +219,22 @@ def get_version():
     return {"version": __version__}
 
 
+@app.get("/api/server-info")
+def get_server_info():
+    """Return server base URL for OpenAI API (Python backend address)."""
+    last = read_last_api()
+    if last:
+        host, port = last
+        host = host or "127.0.0.1"
+        port = port or 8088
+        base_url = f"http://{host}:{port}"
+    else:
+        base_url = "http://127.0.0.1:8088"
+    return {"base_url": base_url}
+
+
 app.include_router(api_router, prefix="/api")
+app.include_router(openai_router, prefix="/v1")
 
 app.include_router(
     agent_app.router,

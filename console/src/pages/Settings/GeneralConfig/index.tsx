@@ -40,6 +40,7 @@ function GeneralConfigPage() {
         heartbeat_active_end: hb?.active_hours?.end ?? "22:00",
         show_tool_details: config.show_tool_details,
         language: config.language,
+        openai_api_key: config.openai_api_key ?? "",
       });
       setActiveHoursEnabled(!!hb?.active_hours);
     } catch (err) {
@@ -67,6 +68,7 @@ function GeneralConfigPage() {
         },
         show_tool_details: values.show_tool_details,
         language: values.language,
+        openai_api_key: values.openai_api_key ?? "",
       };
       setSaving(true);
       await api.updateDefaultsConfig(req);
@@ -206,6 +208,20 @@ function GeneralConfigPage() {
                 <Radio value="zh">{t("generalConfig.languageZh")}</Radio>
                 <Radio value="en">{t("generalConfig.languageEn")}</Radio>
               </Radio.Group>
+            </Form.Item>
+
+            <div className={styles.sectionTitle}>
+              {t("generalConfig.openaiSection")}
+            </div>
+            <Form.Item
+              label={t("generalConfig.openaiApiKeyLabel")}
+              name="openai_api_key"
+              tooltip={t("generalConfig.openaiApiKeyTooltip")}
+            >
+              <Input.Password
+                placeholder={t("generalConfig.openaiApiKeyPlaceholder")}
+                autoComplete="off"
+              />
             </Form.Item>
 
             <Form.Item className={styles.buttonGroup}>

@@ -26,6 +26,7 @@ export interface DefaultsConfig {
   heartbeat: HeartbeatConfig | null;
   show_tool_details: boolean;
   language: string;
+  openai_api_key?: string;
 }
 
 export interface DefaultsConfigRequest {
@@ -36,4 +37,5 @@ export interface DefaultsConfigRequest {
   } | null;
   show_tool_details: boolean;
   language: string;
+  openai_api_key?: string;
 }
