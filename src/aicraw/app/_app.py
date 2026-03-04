@@ -215,7 +215,7 @@ def read_root():
 
 @app.get("/api/version")
 def get_version():
-    """Return the current Aicraw version."""
+    """Return the current LinClaw version."""
     return {"version": __version__}
 
 

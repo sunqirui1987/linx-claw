@@ -1,5 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-# PyInstaller spec for Aicraw desktop app.
+# PyInstaller spec for LinClaw desktop app.
 # Run from repo root after building console: pyinstaller packaging/aicraw_desktop.spec
 
 import os
@@ -50,7 +50,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name="Aicraw",
+    name="LinClaw",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -72,5 +72,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name="Aicraw",
+    name="LinClaw",
 )

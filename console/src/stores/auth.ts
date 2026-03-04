@@ -29,13 +29,20 @@ export const useAuthStore = create<AuthState>()(
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ apiKey: apiKey.trim() }),
           });
-          const data = (await resp.json()) as { success?: boolean; error?: string };
+          const data = (await resp.json()) as {
+            success?: boolean;
+            error?: string;
+            detail?: string;
+          };
           if (data.success) {
             set({ apiKey: apiKey.trim(), isAuthenticated: true, isLoading: false });
             return { success: true };
           }
           set({ isLoading: false });
-          return { success: false, error: data.error || "API Key 无效" };
+          return {
+            success: false,
+            error: data.error || data.detail || "API Key 无效",
+          };
         } catch (err) {
           set({ isLoading: false });
           return {

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * 构建 Python 后端供 Electron 打包
- * 输出: python-dist/Aicraw/ (供 electron-builder extraResources)
+ * 输出: python-dist/LinClaw/ (供 electron-builder extraResources)
  * 使用 venv 避免 externally-managed-environment，生成的 exe 可在无 Python 的电脑上运行
  */
 import { existsSync } from 'fs'
@@ -12,9 +12,9 @@ import { spawnSync } from 'child_process'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 const repoRoot = join(__dirname, '..')
-const pythonDistDir = join(repoRoot, 'python-dist', 'Aicraw')
+const pythonDistDir = join(repoRoot, 'python-dist', 'LinClaw')
 const venvDir = join(repoRoot, '.build-venv')
-const exeName = process.platform === 'win32' ? 'Aicraw.exe' : 'Aicraw'
+const exeName = process.platform === 'win32' ? 'LinClaw.exe' : 'LinClaw'
 const exePath = join(pythonDistDir, exeName)
 const force = process.argv.includes('--force')
 
@@ -82,6 +82,16 @@ if (needVenv) {
 // 1. Build console
 const consoleDir = join(repoRoot, 'console')
 const consoleDest = join(repoRoot, 'src', 'aicraw', 'console')
+
+console.log('[python-backend] Installing console dependencies...')
+const pnpmInstall = spawnSync('pnpm', ['install', '--frozen-lockfile'], {
+  cwd: consoleDir,
+  stdio: 'inherit',
+})
+if (pnpmInstall.status !== 0) {
+  console.error('[python-backend] Console pnpm install failed.')
+  process.exit(pnpmInstall.status ?? 1)
+}
 
 console.log('[python-backend] Building console frontend...')
 const pnpmBuild = spawnSync('pnpm', ['run', 'build'], {

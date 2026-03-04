@@ -1,5 +1,5 @@
 /**
- * Aicraw Electron 主进程
+ * LinClaw Electron 主进程
  * 参考 qiniu-aistudio 结构：启动时 spawn Python 后端，加载控制台 URL
  */
 import { app, BrowserWindow, shell, ipcMain } from 'electron'
@@ -27,9 +27,9 @@ function getPythonExecutablePath(): string | null {
     return null
   }
   const resourcesPath = process.resourcesPath
-  const binDir = join(resourcesPath, 'bin', 'aicraw')
+  const binDir = join(resourcesPath, 'bin', 'linclaw')
   const isWin = process.platform === 'win32'
-  const exeName = isWin ? 'Aicraw.exe' : 'Aicraw'
+  const exeName = isWin ? 'LinClaw.exe' : 'LinClaw'
   const exePath = join(binDir, exeName)
   if (existsSync(exePath)) {
     return exePath
@@ -41,7 +41,7 @@ function getPythonExecutablePath(): string | null {
 async function startPythonBackend(): Promise<boolean> {
   const exePath = getPythonExecutablePath()
   if (exePath) {
-    console.log('[Aicraw] Starting bundled Python backend:', exePath)
+    console.log('[LinClaw] Starting bundled Python backend:', exePath)
     const binDir = dirname(exePath)
     pythonProcess = spawn(exePath, [], {
       stdio: ['ignore', 'pipe', 'pipe'],
@@ -50,11 +50,11 @@ async function startPythonBackend(): Promise<boolean> {
     })
     pythonProcess.stdout?.on('data', (d) => process.stdout.write(d.toString()))
     pythonProcess.stderr?.on('data', (d) => process.stderr.write(d.toString()))
-    pythonProcess.on('error', (err) => console.error('[Aicraw] Python process error:', err))
-    pythonProcess.on('exit', (code) => console.log('[Aicraw] Python process exited:', code))
+    pythonProcess.on('error', (err) => console.error('[LinClaw] Python process error:', err))
+    pythonProcess.on('exit', (code) => console.log('[LinClaw] Python process exited:', code))
   } else {
     // 开发模式：假设用户已手动运行 aicraw app
-    console.log('[Aicraw] Dev mode: expecting aicraw app running at', APP_URL)
+    console.log('[LinClaw] Dev mode: expecting aicraw app running at', APP_URL)
   }
   return true
 }
@@ -123,12 +123,12 @@ function createWindow(): void {
 ipcMain.handle('shell:openExternal', (_event, url: string) => shell.openExternal(url))
 
 app.whenReady().then(async () => {
-  electronApp.setAppUserModelId('com.aicraw.desktop')
+  electronApp.setAppUserModelId('com.linclaw.desktop')
 
   await startPythonBackend()
   const ready = await waitForServer()
   if (!ready) {
-    console.error('[Aicraw] Backend did not start in time. Make sure aicraw app is running in dev mode.')
+    console.error('[LinClaw] Backend did not start in time. Make sure aicraw app is running in dev mode.')
     if (!is.dev) {
       app.quit()
       return

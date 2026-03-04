@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Build Aicraw desktop app (PyInstaller).
+# Build LinClaw desktop app (PyInstaller).
 # Run from repo root: bash scripts/desktop_build.sh
-# Output: dist/Aicraw/ (onedir bundle)
+# Output: dist/LinClaw/ (onedir bundle)
 set -e
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -33,4 +33,4 @@ fi
 echo "[desktop_build] Running PyInstaller..."
 pyinstaller --noconfirm --clean "$SPEC"
 
-echo "[desktop_build] Done. Output: $REPO_ROOT/dist/Aicraw/"
+echo "[desktop_build] Done. Output: $REPO_ROOT/dist/LinClaw/"

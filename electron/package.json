@@ -14,8 +14,8 @@
     "electron-builder": "^25.0.0"
   },
   "build": {
-    "appId": "ai.aicraw.desktop",
-    "productName": "Aicraw",
+    "appId": "ai.linclaw.desktop",
+    "productName": "LinClaw",
     "directories": {
       "output": "dist"
     },

@@ -1,24 +1,24 @@
 #!/usr/bin/env bash
-# Create Aicraw.dmg for macOS.
+# Create LinClaw.dmg for macOS.
 # Run from repo root after desktop_build.sh:
 #   bash packaging/mac/create_dmg.sh
-# Output: dist/Aicraw.dmg
+# Output: dist/LinClaw.dmg
 set -e
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$REPO_ROOT"
 
 DIST_DIR="$REPO_ROOT/dist"
-if [[ -d "$DIST_DIR/Aicraw.app" ]]; then
-  SOURCE="$DIST_DIR/Aicraw.app"
-elif [[ -d "$DIST_DIR/Aicraw" ]]; then
-  SOURCE="$DIST_DIR/Aicraw"
+if [[ -d "$DIST_DIR/LinClaw.app" ]]; then
+  SOURCE="$DIST_DIR/LinClaw.app"
+elif [[ -d "$DIST_DIR/LinClaw" ]]; then
+  SOURCE="$DIST_DIR/LinClaw"
 else
-  echo "Error: dist/Aicraw or dist/Aicraw.app not found. Run desktop_build.sh first."
+  echo "Error: dist/LinClaw or dist/LinClaw.app not found. Run desktop_build.sh first."
   exit 1
 fi
-DMG_OUT="$DIST_DIR/Aicraw.dmg"
-VOLNAME="Aicraw"
+DMG_OUT="$DIST_DIR/LinClaw.dmg"
+VOLNAME="LinClaw"
 
 # Prefer create-dmg if available (nicer DMG with Applications link)
 if command -v create-dmg &>/dev/null; then
