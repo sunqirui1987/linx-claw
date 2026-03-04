@@ -1,8 +1,8 @@
-# Aicraw Installer for Windows
+# LinClaw Installer for Windows
 # Usage: irm <url>/install.ps1 | iex
 #    or: .\install.ps1 [-Version X.Y.Z] [-FromSource [DIR]] [-Extras "llamacpp,mlx"]
 #
-# Installs Aicraw into ~/.aicraw with a uv-managed Python environment.
+# Installs LinClaw into ~/.aicraw with a uv-managed Python environment.
 # Users do NOT need Python pre-installed — uv handles everything.
 #
 # The entire script is wrapped in & { ... } @args so that `irm | iex` works
@@ -20,11 +20,11 @@ param(
 $ErrorActionPreference = "Stop"
 
 # ── Defaults ──────────────────────────────────────────────────────────────────
-$AicrawHome = if ($env:AICRAW_HOME) { $env:AICRAW_HOME } else { Join-Path $HOME ".aicraw" }
-$AicrawVenv = Join-Path $AicrawHome "venv"
-$AicrawBin = Join-Path $AicrawHome "bin"
+$LinClawHome = if ($env:AICRAW_HOME) { $env:AICRAW_HOME } else { Join-Path $HOME ".aicraw" }
+$LinClawVenv = Join-Path $LinClawHome "venv"
+$LinClawBin = Join-Path $LinClawHome "bin"
 $PythonVersion = "3.12"
-$AicrawRepo = "https://github.com/agentscope-ai/Aicraw.git"
+$LinClawRepo = "https://github.com/sunqirui1987/linx-craw.git"
 
 # ── Colors ────────────────────────────────────────────────────────────────────
 function Write-Info { param([string]$Message) Write-Host "[aicraw] " -ForegroundColor Green -NoNewline; Write-Host $Message }
@@ -35,7 +35,7 @@ function Stop-WithError { param([string]$Message) Write-Err $Message; exit 1 }
 # ── Help ──────────────────────────────────────────────────────────────────────
 if ($Help) {
     @"
-Aicraw Installer for Windows
+LinClaw Installer for Windows
 
 Usage: .\install.ps1 [OPTIONS]
 
@@ -54,8 +54,8 @@ Environment:
 }
 
 Write-Host "[aicraw] " -ForegroundColor Green -NoNewline
-Write-Host "Installing Aicraw into " -NoNewline
-Write-Host "$AicrawHome" -ForegroundColor White
+Write-Host "Installing LinClaw into " -NoNewline
+Write-Host "$LinClawHome" -ForegroundColor White
 
 # ── Execution Policy Check ────────────────────────────────────────────────────
 $policy = Get-ExecutionPolicy
@@ -124,22 +124,22 @@ function Ensure-Uv {
 Ensure-Uv
 
 # ── Step 2: Create / update virtual environment ──────────────────────────────
-if (Test-Path $AicrawVenv) {
+if (Test-Path $LinClawVenv) {
     Write-Info "Existing environment found, upgrading..."
 } else {
     Write-Info "Creating Python $PythonVersion environment..."
 }
 
-uv venv $AicrawVenv --python $PythonVersion --quiet
+uv venv $LinClawVenv --python $PythonVersion --quiet
 if ($LASTEXITCODE -ne 0) { Stop-WithError "Failed to create virtual environment" }
 
-$VenvPython = Join-Path $AicrawVenv "Scripts\python.exe"
+$VenvPython = Join-Path $LinClawVenv "Scripts\python.exe"
 if (-not (Test-Path $VenvPython)) { Stop-WithError "Failed to create virtual environment" }
 
 $pyVersion = & $VenvPython --version 2>&1
 Write-Info "Python environment ready ($pyVersion)"
 
-# ── Step 3: Install Aicraw ────────────────────────────────────────────────────
+# ── Step 3: Install LinClaw ────────────────────────────────────────────────────
 # Build extras suffix: "" or "[llamacpp,mlx]"
 $ExtrasSuffix = ""
 if ($Extras) {
@@ -225,12 +225,12 @@ function Cleanup-Console {
     }
 }
 
-$VenvAicraw = Join-Path $AicrawVenv "Scripts\aicraw.exe"
+$VenvLinClaw = Join-Path $LinClawVenv "Scripts\aicraw.exe"
 
 if ($FromSource) {
     if ($SourceDir) {
         $SourceDir = (Resolve-Path $SourceDir).Path
-        Write-Info "Installing Aicraw from local source: $SourceDir"
+        Write-Info "Installing LinClaw from local source: $SourceDir"
         Prepare-Console $SourceDir
         Write-Info "Installing package from source..."
         uv pip install "${SourceDir}${ExtrasSuffix}" --python $VenvPython --prerelease=allow
@@ -238,12 +238,12 @@ if ($FromSource) {
         Cleanup-Console $SourceDir
     } else {
         if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
-            Stop-WithError "git is required for -FromSource without a local directory. Please install Git from https://git-scm.com/ or pass a local path: .\install.ps1 -FromSource -SourceDir C:\path\to\Aicraw"
+            Stop-WithError "git is required for -FromSource without a local directory. Please install Git from https://git-scm.com/ or pass a local path: .\install.ps1 -FromSource -SourceDir C:\path\to\LinClaw"
         }
-        Write-Info "Installing Aicraw from source (GitHub)..."
+        Write-Info "Installing LinClaw from source (GitHub)..."
         $cloneDir = Join-Path $env:TEMP "aicraw-install-$(Get-Random)"
         try {
-            git clone --depth 1 $AicrawRepo $cloneDir
+            git clone --depth 1 $LinClawRepo $cloneDir
             if ($LASTEXITCODE -ne 0) { Stop-WithError "Failed to clone repository" }
             Prepare-Console $cloneDir
             Write-Info "Installing package from source..."
@@ -267,9 +267,9 @@ if ($FromSource) {
 }
 
 # Verify the CLI entry point exists
-if (-not (Test-Path $VenvAicraw)) { Stop-WithError "Installation failed: aicraw CLI not found in venv" }
+if (-not (Test-Path $VenvLinClaw)) { Stop-WithError "Installation failed: aicraw CLI not found in venv" }
 
-Write-Info "Aicraw installed successfully"
+Write-Info "LinClaw installed successfully"
 
 # Check console availability (for PyPI installs, check the installed package)
 if (-not $script:ConsoleAvailable) {
@@ -278,18 +278,18 @@ if (-not $script:ConsoleAvailable) {
 }
 
 # ── Step 4: Create wrapper script ────────────────────────────────────────────
-New-Item -ItemType Directory -Path $AicrawBin -Force | Out-Null
+New-Item -ItemType Directory -Path $LinClawBin -Force | Out-Null
 
-$wrapperPath = Join-Path $AicrawBin "aicraw.ps1"
+$wrapperPath = Join-Path $LinClawBin "aicraw.ps1"
 $wrapperContent = @'
-# Aicraw CLI wrapper — delegates to the uv-managed environment.
+# LinClaw CLI wrapper — delegates to the uv-managed environment.
 $ErrorActionPreference = "Stop"
 
-$AicrawHome = if ($env:AICRAW_HOME) { $env:AICRAW_HOME } else { Join-Path $HOME ".aicraw" }
-$RealBin = Join-Path $AicrawHome "venv\Scripts\aicraw.exe"
+$LinClawHome = if ($env:AICRAW_HOME) { $env:AICRAW_HOME } else { Join-Path $HOME ".aicraw" }
+$RealBin = Join-Path $LinClawHome "venv\Scripts\aicraw.exe"
 
 if (-not (Test-Path $RealBin)) {
-    Write-Error "Aicraw environment not found at $AicrawHome\venv"
+    Write-Error "LinClaw environment not found at $LinClawHome\venv"
     Write-Error "Please reinstall: irm <install-url> | iex"
     exit 1
 }
@@ -301,15 +301,15 @@ Set-Content -Path $wrapperPath -Value $wrapperContent -Encoding UTF8
 Write-Info "Wrapper created at $wrapperPath"
 
 # Also create a .cmd wrapper for use from cmd.exe
-$cmdWrapperPath = Join-Path $AicrawBin "aicraw.cmd"
+$cmdWrapperPath = Join-Path $LinClawBin "aicraw.cmd"
 $cmdWrapperContent = @"
 @echo off
-REM Aicraw CLI wrapper — delegates to the uv-managed environment.
+REM LinClaw CLI wrapper — delegates to the uv-managed environment.
 set "AICRAW_HOME=%AICRAW_HOME%"
 if "%AICRAW_HOME%"=="" set "AICRAW_HOME=%USERPROFILE%\.aicraw"
 set "REAL_BIN=%AICRAW_HOME%\venv\Scripts\aicraw.exe"
 if not exist "%REAL_BIN%" (
-    echo Error: Aicraw environment not found at %AICRAW_HOME%\venv >&2
+    echo Error: LinClaw environment not found at %AICRAW_HOME%\venv >&2
     echo Please reinstall: irm ^<install-url^> ^| iex >&2
     exit /b 1
 )
@@ -321,21 +321,21 @@ Write-Info "CMD wrapper created at $cmdWrapperPath"
 
 # ── Step 5: Update PATH via User Environment Variable ────────────────────────
 $currentUserPath = [Environment]::GetEnvironmentVariable("Path", "User")
-if ($currentUserPath -notlike "*$AicrawBin*") {
-    [Environment]::SetEnvironmentVariable("Path", "$AicrawBin;$currentUserPath", "User")
-    $env:PATH = "$AicrawBin;$env:PATH"
-    Write-Info "Added $AicrawBin to user PATH"
+if ($currentUserPath -notlike "*$LinClawBin*") {
+    [Environment]::SetEnvironmentVariable("Path", "$LinClawBin;$currentUserPath", "User")
+    $env:PATH = "$LinClawBin;$env:PATH"
+    Write-Info "Added $LinClawBin to user PATH"
 } else {
-    Write-Info "$AicrawBin already in PATH"
+    Write-Info "$LinClawBin already in PATH"
 }
 
 # ── Done ──────────────────────────────────────────────────────────────────────
 Write-Host ""
-Write-Host "Aicraw installed successfully!" -ForegroundColor Green
+Write-Host "LinClaw installed successfully!" -ForegroundColor Green
 Write-Host ""
 
 # Install summary
-Write-Host "  Install location:  " -NoNewline; Write-Host "$AicrawHome" -ForegroundColor White
+Write-Host "  Install location:  " -NoNewline; Write-Host "$LinClawHome" -ForegroundColor White
 Write-Host "  Python:            " -NoNewline; Write-Host "$pyVersion" -ForegroundColor White
 if ($script:ConsoleAvailable) {
     Write-Host "  Console (web UI):  " -NoNewline; Write-Host "available" -ForegroundColor Green
@@ -347,7 +347,7 @@ Write-Host ""
 
 Write-Host "To get started, open a new terminal and run:"
 Write-Host ""
-Write-Host "  aicraw app" -ForegroundColor White -NoNewline; Write-Host "        # start Aicraw (configure in browser)"
+Write-Host "  aicraw app" -ForegroundColor White -NoNewline; Write-Host "        # start LinClaw (configure in browser)"
 Write-Host "  aicraw init" -ForegroundColor White -NoNewline; Write-Host "       # optional: interactive setup"
 Write-Host ""
 Write-Host "To upgrade later, re-run this installer."

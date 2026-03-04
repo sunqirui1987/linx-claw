@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Desktop app entry: native window loading Aicraw console via PyWebView."""
+"""Desktop app entry: native window loading LinClaw console via PyWebView."""
 from __future__ import annotations
 
 import logging
@@ -73,7 +73,7 @@ def _wait_for_server(timeout_sec: float = 30.0) -> bool:
 
 
 def main() -> None:
-    """Start Aicraw as a native desktop app: server in background, PyWebView window."""
+    """Start LinClaw as a native desktop app: server in background, PyWebView window."""
     if not _ensure_init():
         sys.exit(1)
 
@@ -87,7 +87,7 @@ def main() -> None:
     import webview
 
     webview.create_window(
-        "Aicraw",
+        "LinClaw",
         URL,
         width=1200,
         height=800,

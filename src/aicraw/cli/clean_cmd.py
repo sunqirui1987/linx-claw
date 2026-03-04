@@ -23,7 +23,7 @@ def _iter_children(p: Path) -> list[Path]:
     help="List what would be deleted, but do not delete",
 )
 def clean_cmd(yes: bool, dry_run: bool) -> None:
-    """Clear Aicraw WORKING_DIR (~/.aicraw by default)."""
+    """Clear LinClaw WORKING_DIR (~/.aicraw by default)."""
     wd = WORKING_DIR
 
     if not wd.exists():

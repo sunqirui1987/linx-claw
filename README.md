@@ -1,9 +1,9 @@
-# Aicraw
+# LinClaw
 
 基于七牛云的 AI 个人助理，支持钉钉、飞书、QQ 等多端接入。
 
-![LinCraw Chat](docs/image.png)
-![LinCraw Chat](docs/image2.png)
+![LinClaw Chat](docs/image.png)
+![LinClaw Chat](docs/image2.png)
 
 ## 环境要求
 
@@ -85,14 +85,14 @@ pnpm run build:electron:mac   # macOS
 pnpm run build:electron:win   # Windows
 ```
 
-`build:python` 会依次：构建 console 前端 → 复制到 `src/aicraw/console` → 用 PyInstaller 打包 Python 到 `python-dist/Aicraw`。`build:electron:*` 将 `python-dist` 与 Electron 一起打包。
+`build:python` 会依次：构建 console 前端 → 复制到 `src/aicraw/console` → 用 PyInstaller 打包 Python 到 `python-dist/LinClaw`。`build:electron:*` 将 `python-dist` 与 Electron 一起打包。
 
 ### 输出文件
 
 | 平台 | 输出路径 |
 |------|----------|
-| macOS | `release/Aicraw-<版本>-universal.dmg`（universal 安装包，支持 Intel 与 Apple Silicon） |
-| Windows | `release/Aicraw Setup <版本>.exe`（安装程序）、`release/Aicraw <版本> Portable.exe`（便携版） |
+| macOS | `release/LinClaw-<版本>-universal.dmg`（universal 安装包，支持 Intel 与 Apple Silicon） |
+| Windows | `release/LinClaw Setup <版本>.exe`（安装程序）、`release/LinClaw <版本> Portable.exe`（便携版） |
 
 ### 窗口拖拽（macOS）
 

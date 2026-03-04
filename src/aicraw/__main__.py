@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Allow running Aicraw via ``python -m aicraw``."""
+"""Allow running LinClaw via ``python -m aicraw``."""
 from .cli.main import cli
 
 if __name__ == "__main__":
