@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Aicraw Installer
+# LinClaw Installer
 # Usage: curl -fsSL <url>/install.sh | bash
 #    or: bash install.sh [--version X.Y.Z] [--from-source]
 #
-# Installs Aicraw into ~/.aicraw with a uv-managed Python environment.
+# Installs LinClaw into ~/.aicraw with a uv-managed Python environment.
 # Users do NOT need Python pre-installed — uv handles everything.
 set -euo pipefail
 
@@ -12,7 +12,7 @@ AICRAW_HOME="${AICRAW_HOME:-$HOME/.aicraw}"
 AICRAW_VENV="$AICRAW_HOME/venv"
 AICRAW_BIN="$AICRAW_HOME/bin"
 PYTHON_VERSION="3.12"
-AICRAW_REPO="https://github.com/agentscope-ai/Aicraw.git"
+AICRAW_REPO="https://github.com/sunqirui1987/linx-craw.git"
 
 VERSION=""
 FROM_SOURCE=false
@@ -52,7 +52,7 @@ while [[ $# -gt 0 ]]; do
             EXTRAS="$2"; shift 2 ;;
         -h|--help)
             cat <<EOF
-Aicraw Installer
+LinClaw Installer
 
 Usage: bash install.sh [OPTIONS]
 
@@ -80,7 +80,7 @@ case "$OS" in
     *) die "Unsupported OS: $OS. This installer supports Linux and macOS only." ;;
 esac
 
-printf "${GREEN}[aicraw]${RESET} Installing Aicraw into ${BOLD}%s${RESET}\n" "$AICRAW_HOME"
+printf "${GREEN}[aicraw]${RESET} Installing LinClaw into ${BOLD}%s${RESET}\n" "$AICRAW_HOME"
 
 # ── Step 1: Ensure uv is available ───────────────────────────────────────────
 ensure_uv() {
@@ -127,7 +127,7 @@ uv venv "$AICRAW_VENV" --python "$PYTHON_VERSION" --quiet
 [ -x "$AICRAW_VENV/bin/python" ] || die "Failed to create virtual environment"
 info "Python environment ready ($("$AICRAW_VENV/bin/python" --version))"
 
-# ── Step 3: Install Aicraw ────────────────────────────────────────────────────
+# ── Step 3: Install LinClaw ────────────────────────────────────────────────────
 # Build extras suffix: "" or "[llamacpp,mlx]"
 EXTRAS_SUFFIX=""
 if [ -n "$EXTRAS" ]; then
@@ -209,13 +209,13 @@ cleanup_console() {
 
 if [ "$FROM_SOURCE" = true ]; then
     if [ -n "$SOURCE_DIR" ]; then
-        info "Installing Aicraw from local source: $SOURCE_DIR"
+        info "Installing LinClaw from local source: $SOURCE_DIR"
         prepare_console "$SOURCE_DIR"
         info "Installing package from source..."
         uv pip install "${SOURCE_DIR}${EXTRAS_SUFFIX}" --python "$AICRAW_VENV/bin/python" --prerelease=allow
         cleanup_console "$SOURCE_DIR"
     else
-        info "Installing Aicraw from source (GitHub)..."
+        info "Installing LinClaw from source (GitHub)..."
         CLONE_DIR="$(mktemp -d)"
         trap 'rm -rf "$CLONE_DIR"' EXIT
         git clone --depth 1 "$AICRAW_REPO" "$CLONE_DIR"
@@ -236,7 +236,7 @@ fi
 
 # Verify the CLI entry point exists
 [ -x "$AICRAW_VENV/bin/aicraw" ] || die "Installation failed: aicraw CLI not found in venv"
-info "Aicraw installed successfully"
+info "LinClaw installed successfully"
 
 # Check console availability (for PyPI installs, check the installed package)
 if [ "$_CONSOLE_AVAILABLE" = 0 ]; then
@@ -252,14 +252,14 @@ mkdir -p "$AICRAW_BIN"
 
 cat > "$AICRAW_BIN/aicraw" << 'WRAPPER'
 #!/usr/bin/env bash
-# Aicraw CLI wrapper — delegates to the uv-managed environment.
+# LinClaw CLI wrapper — delegates to the uv-managed environment.
 set -euo pipefail
 
 AICRAW_HOME="${AICRAW_HOME:-$HOME/.aicraw}"
 REAL_BIN="$AICRAW_HOME/venv/bin/aicraw"
 
 if [ ! -x "$REAL_BIN" ]; then
-    echo "Error: Aicraw environment not found at $AICRAW_HOME/venv" >&2
+    echo "Error: LinClaw environment not found at $AICRAW_HOME/venv" >&2
     echo "Please reinstall: curl -fsSL <install-url> | bash" >&2
     exit 1
 fi
@@ -279,7 +279,7 @@ add_to_profile() {
         return 0  # already present
     fi
     if [ -f "$profile" ] || [ "$2" = "create" ]; then
-        printf '\n# Aicraw\n%s\n' "$PATH_ENTRY" >> "$profile"
+        printf '\n# LinClaw\n%s\n' "$PATH_ENTRY" >> "$profile"
         info "Updated $profile"
         return 0
     fi
@@ -303,7 +303,7 @@ esac
 
 # ── Done ──────────────────────────────────────────────────────────────────────
 echo ""
-printf "${GREEN}${BOLD}Aicraw installed successfully!${RESET}\n"
+printf "${GREEN}${BOLD}LinClaw installed successfully!${RESET}\n"
 echo ""
 
 # Install summary
@@ -326,7 +326,7 @@ fi
 
 echo "Then run:"
 echo ""
-printf "  ${BOLD}aicraw app${RESET}        # start Aicraw (configure in browser)\n"
+printf "  ${BOLD}aicraw app${RESET}        # start LinClaw (configure in browser)\n"
 printf "  ${BOLD}aicraw init${RESET}       # optional: interactive setup\n"
 echo ""
 printf "To upgrade later, re-run this installer.\n"

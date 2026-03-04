@@ -1,24 +1,27 @@
 {
   "name": "aicraw",
-  "productName": "Aicraw",
+  "productName": "LinClaw",
   "version": "0.1.0",
   "description": "AI 个人助理 - 支持钉钉、飞书、QQ 等多端接入",
-  "author": "Aicraw Team",
+  "author": "LinClaw Team",
   "license": "MIT",
   "private": true,
   "type": "module",
   "pnpm": {
-    "onlyBuiltDependencies": ["electron"]
+    "onlyBuiltDependencies": [
+      "electron"
+    ]
   },
   "main": "dist-electron/main.js",
   "scripts": {
     "dev:electron": "vite build --config vite.electron.config.ts && electron .",
     "build:python": "node scripts/ensure-python-backend.mjs --force",
     "build:electron": "node scripts/sync-icons.mjs && node scripts/check-python-dist.mjs && vite build --config vite.electron.config.ts && electron-builder",
-    "build:electron:mac": "node scripts/sync-icons.mjs && node scripts/check-python-dist.mjs && vite build --config vite.electron.config.ts && electron-builder --mac",
-    "build:electron:mac:arm64": "node scripts/sync-icons.mjs && node scripts/check-python-dist.mjs && vite build --config vite.electron.config.ts && electron-builder --mac --arm64",
-    "build:electron:mac:x64": "node scripts/sync-icons.mjs && node scripts/check-python-dist.mjs && vite build --config vite.electron.config.ts && electron-builder --mac --x64",
-    "build:electron:win": "node scripts/sync-icons.mjs && node scripts/check-python-dist.mjs && vite build --config vite.electron.config.ts && electron-builder --win",
+    "build:electron:mac": "node scripts/sync-icons.mjs && node scripts/check-python-dist.mjs --target=darwin && vite build --config vite.electron.config.ts && electron-builder --mac",
+    "build:electron:mac:arm64": "node scripts/sync-icons.mjs && node scripts/check-python-dist.mjs --target=darwin && vite build --config vite.electron.config.ts && electron-builder --mac --arm64",
+    "build:electron:mac:x64": "node scripts/sync-icons.mjs && node scripts/check-python-dist.mjs --target=darwin && vite build --config vite.electron.config.ts && electron-builder --mac --x64",
+    "build:electron:win": "node scripts/sync-icons.mjs && node scripts/check-python-dist.mjs --target=win32 && vite build --config vite.electron.config.ts && electron-builder --win",
+    "build:all": "bash scripts/build-all.sh",
     "postinstall": "electron-builder install-app-deps"
   },
   "devDependencies": {
@@ -30,9 +33,9 @@
     "vite-plugin-electron": "^0.28.8"
   },
   "build": {
-    "appId": "com.aicraw.desktop",
-    "productName": "Aicraw",
-    "copyright": "Copyright © 2025 Aicraw",
+    "appId": "com.linclaw.desktop",
+    "productName": "LinClaw",
+    "copyright": "Copyright © 2025 LinClaw",
     "directories": {
       "output": "release",
       "buildResources": "build"
@@ -43,35 +46,49 @@
     ],
     "extraResources": [
       {
-        "from": "python-dist/Aicraw",
-        "to": "bin/aicraw",
-        "filter": ["**/*"]
+        "from": "python-dist/LinClaw",
+        "to": "bin/linclaw",
+        "filter": [
+          "**/*"
+        ]
       }
     ],
     "mac": {
-      "category": "public.app-category.productivity",
+      "category": "public.app-category.developer-tools",
       "icon": "build/icon.icns",
       "target": [
-        { "target": "dmg", "arch": ["arm64", "x64"] }
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
       ],
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "entitlements": "build/entitlements.mac.plist",
       "entitlementsInherit": "build/entitlements.mac.plist",
-      "notarize": false
-    },
-    "dmg": {
-      "sign": false,
-      "contents": [
-        { "x": 130, "y": 220 },
-        { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
-      ]
+      "identity": "Shanghai Qiniu Information Technologies Co., Ltd. (W2TP34G2MM)",
+      "notarize": {
+        "teamId": "W2TP34G2MM"
+      }
     },
     "win": {
       "icon": "build/icon.ico",
       "target": [
-        { "target": "nsis", "arch": ["x64"] },
-        { "target": "portable", "arch": ["x64"] }
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
       ]
     },
     "nsis": {

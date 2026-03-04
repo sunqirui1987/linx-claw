@@ -83,7 +83,7 @@ body {
   padding: 0;
 }
 
-/* Welcome avatar: full tall SVG. Class is Aicraw-avatar (no "ant"). */
+/* Welcome avatar: full tall SVG. Class is LinClaw-avatar (no "ant"). */
 [class*="chat-anywhere-welcome-default"] [class*="-avatar"],
 [class*="message-list-welcome"] [class*="welcome-default"] [class*="-avatar"] {
   width: 36px !important;

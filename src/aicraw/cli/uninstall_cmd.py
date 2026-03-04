@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""aicraw uninstall — remove the Aicraw environment and CLI wrapper."""
+"""aicraw uninstall — remove the LinClaw environment and CLI wrapper."""
 from __future__ import annotations
 
 import shutil
@@ -24,15 +24,15 @@ _SHELL_PROFILES = (
 
 def _remove_path_entry(profile: Path) -> bool:
     """
-    Remove Aicraw PATH lines from a shell profile. Returns True if changed.
+    Remove LinClaw/Aicraw PATH lines from a shell profile. Returns True if changed.
     """
     if not profile.is_file():
         return False
 
     text = profile.read_text()
-    # Remove the "# Aicraw" comment line and the export PATH line
+    # Remove either "# LinClaw" or legacy "# Aicraw" comment line and PATH export.
     cleaned = re.sub(
-        r"\n?# Aicraw\nexport PATH=\"\$HOME/.aicraw/bin:\$PATH\"\n?",
+        r"\n?# (?:LinClaw|Aicraw)\nexport PATH=\"\$HOME/.aicraw/bin:\$PATH\"\n?",
         "\n",
         text,
     )
@@ -51,14 +51,14 @@ def _remove_path_entry(profile: Path) -> bool:
 )
 @click.option("--yes", is_flag=True, help="Do not prompt for confirmation")
 def uninstall_cmd(purge: bool, yes: bool) -> None:
-    """Remove Aicraw environment, CLI wrapper, and shell PATH entries."""
+    """Remove LinClaw environment, CLI wrapper, and shell PATH entries."""
     wd = WORKING_DIR
 
     if purge:
-        click.echo(f"This will remove ALL Aicraw data in {wd}")
+        click.echo(f"This will remove ALL LinClaw data in {wd}")
     else:
         click.echo(
-            "This will remove the Aicraw Python environment and CLI wrapper.",
+            "This will remove the LinClaw Python environment and CLI wrapper.",
         )
         click.echo(f"Your configuration and data in {wd} will be preserved.")
 
@@ -86,4 +86,4 @@ def uninstall_cmd(purge: bool, yes: bool) -> None:
             click.echo(f"  Cleaned {profile}")
 
     click.echo("")
-    click.echo("Aicraw uninstalled. Please restart your terminal.")
+    click.echo("LinClaw uninstalled. Please restart your terminal.")

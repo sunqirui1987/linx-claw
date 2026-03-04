@@ -440,7 +440,7 @@
   "init": {
     "title": "First-time Setup",
     "securityTitle": "Security Notice — Please Read",
-    "securityDesc": "Aicraw is a personal assistant that runs in your own environment. It can connect to channels (DingTalk, Feishu, QQ, Discord, iMessage, etc.) and run skills that read files, run commands, and call external APIs. By default it is a single-operator boundary. A malicious or confused prompt can lead the agent to do unsafe things if tools are enabled.\n\nIf multiple people can message the same Aicraw instance with tools enabled, they share the same delegated authority (files, commands, secrets).\n\nRecommended: Restrict which channels and users can trigger the agent; use separate config for multi-user; run skills with least privilege; review config and skills regularly.",
+    "securityDesc": "LinClaw is a personal assistant that runs in your own environment. It can connect to channels (DingTalk, Feishu, QQ, Discord, iMessage, etc.) and run skills that read files, run commands, and call external APIs. By default it is a single-operator boundary. A malicious or confused prompt can lead the agent to do unsafe things if tools are enabled.\n\nIf multiple people can message the same LinClaw instance with tools enabled, they share the same delegated authority (files, commands, secrets).\n\nRecommended: Restrict which channels and users can trigger the agent; use separate config for multi-user; run skills with least privilege; review config and skills regularly.",
     "acceptSecurity": "I have read and understood",
     "startConfig": "Start Configuration",
     "configSteps": "Complete the following to get started:",
