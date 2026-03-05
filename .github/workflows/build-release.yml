@@ -93,6 +93,7 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm run build:electron:mac:arm64
 
       - uses: actions/upload-artifact@v4
@@ -146,6 +147,7 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm run build:electron:mac:x64
 
       - uses: actions/upload-artifact@v4
@@ -196,6 +198,8 @@ jobs:
 
       # 同时生成 NSIS 安装包（LinClaw Setup *.exe）和便携版（LinClaw *.exe）
       - name: 构建 Electron 应用（Windows x64）
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm run build:electron:win
 
       - uses: actions/upload-artifact@v4
