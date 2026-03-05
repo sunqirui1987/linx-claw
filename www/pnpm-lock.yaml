@@ -36,8 +36,8 @@ importers:
         specifier: ^0.577.0
         version: 0.577.0(react@19.2.3)
       mathjs:
-        specifier: ^14.9.1
-        version: 14.9.1
+        specifier: ^15.1.1
+        version: 15.1.1
       matter-js:
         specifier: ^0.20.0
         version: 0.20.0
@@ -2984,8 +2984,8 @@ packages:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
 
-  mathjs@14.9.1:
-    resolution: {integrity: sha512-xhqv8Xjf+caWG3WlaPekg4v8QFOR3D5+8ycfcjMcPcnCNDgAONQLaLfyGgrggJrcHx2yUGCpACRpiD4GmXwX+Q==}
+  mathjs@15.1.1:
+    resolution: {integrity: sha512-rM668DTtpSzMVoh/cKAllyQVEbBApM5g//IMGD8vD7YlrIz9ITRr3SrdhjaDxcBNTdyETWwPebj2unZyHD7ZdA==}
     engines: {node: '>= 18'}
     hasBin: true
 
@@ -6982,7 +6982,7 @@ snapshots:
 
   math-intrinsics@1.1.0: {}
 
-  mathjs@14.9.1:
+  mathjs@15.1.1:
     dependencies:
       '@babel/runtime': 7.28.6
       complex.js: 2.4.3
