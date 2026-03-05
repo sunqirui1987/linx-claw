@@ -20,12 +20,12 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: "LinClaw - AI 个人助理",
-  description: "基于 AgentScope 构建的 AI 个人助理，支持多平台接入，开源免费",
+  description: "让 AI 真正替你做事，支持多平台接入，开源免费",
   keywords: ["AI", "助理", "Agent", "AgentScope", "开源", "钉钉", "飞书", "QQ"],
   authors: [{ name: "LinClaw Team" }],
   openGraph: {
     title: "LinClaw - AI 个人助理",
-    description: "基于 AgentScope 构建的 AI 个人助理，支持多平台接入，开源免费",
+    description: "让 AI 真正替你做事，支持多平台接入，开源免费",
     type: "website",
   },
 };

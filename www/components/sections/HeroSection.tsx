@@ -70,7 +70,7 @@ export default function HeroSection() {
               transition={{ duration: 0.6, delay: 0.4 }}
               className="text-center lg:text-left text-lg md:text-xl text-slate-300 max-w-2xl mx-auto lg:mx-0 mb-4 drop-shadow-lg select-none"
             >
-              基于 AgentScope 构建的 AI 个人助理
+              让 AI 真正替你做事
             </motion.p>
 
             <motion.p

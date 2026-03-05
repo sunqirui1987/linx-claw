@@ -31,7 +31,7 @@ export default function FooterSection() {
               />
             </div>
             <p className="text-slate-400 text-sm leading-relaxed mb-6 max-w-sm">
-              基于 AgentScope 构建的 AI 个人助理，
+              让 AI 真正替你做事，
               支持多平台接入，开源免费，让 AI 触手可及。
             </p>
             <div className="flex items-center gap-4">
