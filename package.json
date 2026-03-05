@@ -1,7 +1,7 @@
 {
   "name": "aicraw",
   "productName": "LinClaw",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AI 个人助理 - 支持钉钉、飞书、QQ 等多端接入",
   "author": "LinClaw Team",
   "license": "MIT",
