@@ -1,8 +1,19 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
+import {
+  Layers2,
+  BrainCircuit,
+  Monitor,
+  Zap,
+  Cloud,
+  Code2,
+  type LucideIcon,
+} from 'lucide-react';
 
 export interface BentoCardProps {
   color?: string;
+  icon?: LucideIcon;
+  iconColor?: string;
   title?: string;
   description?: string;
   label?: string;
@@ -32,39 +43,51 @@ const MOBILE_BREAKPOINT = 768;
 const cardData: BentoCardProps[] = [
   {
     color: '#060010',
-    title: 'Analytics',
-    description: 'Track user behavior',
-    label: 'Insights'
+    icon: Layers2,
+    iconColor: '#818cf8',
+    title: '多平台接入',
+    description: '钉钉、飞书、QQ 多平台一键接入',
+    label: '接入'
   },
   {
     color: '#060010',
-    title: 'Dashboard',
-    description: 'Centralized data view',
-    label: 'Overview'
+    icon: BrainCircuit,
+    iconColor: '#a78bfa',
+    title: 'AI 智能对话',
+    description: '多轮记忆，七牛云 MaaS 驱动',
+    label: '智能'
   },
   {
     color: '#060010',
-    title: 'Collaboration',
-    description: 'Work together seamlessly',
-    label: 'Teamwork'
+    icon: Monitor,
+    iconColor: '#60a5fa',
+    title: '桌面客户端',
+    description: 'macOS & Windows 双端，无需环境',
+    label: '客户端'
   },
   {
     color: '#060010',
-    title: 'Automation',
-    description: 'Streamline workflows',
-    label: 'Efficiency'
+    icon: Zap,
+    iconColor: '#fbbf24',
+    title: '极速部署',
+    description: 'pip install 一步到位，5 分钟上线',
+    label: '部署'
   },
   {
     color: '#060010',
-    title: 'Integration',
-    description: 'Connect favorite tools',
-    label: 'Connectivity'
+    icon: Cloud,
+    iconColor: '#38bdf8',
+    title: '七牛云驱动',
+    description: 'API Key 即用，数据主权自控',
+    label: '云原生'
   },
   {
     color: '#060010',
-    title: 'Security',
-    description: 'Enterprise-grade protection',
-    label: 'Protection'
+    icon: Code2,
+    iconColor: '#34d399',
+    title: '开源免费',
+    description: 'MIT 开源，支持私有部署',
+    label: 'Open Source'
   }
 ];
 
@@ -492,7 +515,7 @@ const BentoCardGrid: React.FC<{
   gridRef?: React.RefObject<HTMLDivElement | null>;
 }> = ({ children, gridRef }) => (
   <div
-    className="bento-section grid gap-2 p-3 max-w-[54rem] select-none relative"
+    className="bento-section grid gap-2 p-3 w-full select-none relative"
     style={{ fontSize: 'clamp(1rem, 0.9rem + 0.5vw, 1.5rem)' }}
     ref={gridRef}
   >
@@ -572,12 +595,12 @@ const MagicBento: React.FC<BentoProps> = ({
               grid-column: span 2;
               grid-row: span 2;
             }
-            
+
             .card-responsive .card:nth-child(4) {
               grid-column: 1 / span 2;
               grid-row: 2 / span 2;
             }
-            
+
             .card-responsive .card:nth-child(6) {
               grid-column: 4;
               grid-row: 3;
@@ -705,6 +728,19 @@ const MagicBento: React.FC<BentoProps> = ({
                   <div className="card__header flex justify-between gap-3 relative text-white">
                     <span className="card__label text-base">{card.label}</span>
                   </div>
+                  {card.icon && (
+                    <div className="flex items-center justify-center my-4">
+                      <div className="relative">
+                        <div
+                          className="absolute inset-0 rounded-full blur-xl opacity-40 scale-[2]"
+                          style={{ background: card.iconColor }}
+                        />
+                        <div className="relative p-3 rounded-xl bg-white/5 border border-white/10">
+                          <card.icon className="w-8 h-8" style={{ color: card.iconColor }} strokeWidth={1.5} />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   <div className="card__content flex flex-col relative text-white">
                     <h3 className={`card__title font-normal text-base m-0 mb-1 ${textAutoHide ? 'text-clamp-1' : ''}`}>
                       {card.title}
@@ -837,6 +873,19 @@ const MagicBento: React.FC<BentoProps> = ({
                 <div className="card__header flex justify-between gap-3 relative text-white">
                   <span className="card__label text-base">{card.label}</span>
                 </div>
+                {card.icon && (
+                  <div className="flex items-center justify-center my-4">
+                    <div className="relative">
+                      <div
+                        className="absolute inset-0 rounded-full blur-xl opacity-40 scale-[2]"
+                        style={{ background: card.iconColor }}
+                      />
+                      <div className="relative p-3 rounded-xl bg-white/5 border border-white/10">
+                        <card.icon className="w-8 h-8" style={{ color: card.iconColor }} strokeWidth={1.5} />
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <div className="card__content flex flex-col relative text-white">
                   <h3 className={`card__title font-normal text-base m-0 mb-1 ${textAutoHide ? 'text-clamp-1' : ''}`}>
                     {card.title}

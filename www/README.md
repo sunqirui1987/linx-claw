@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LinClaw — 官网
 
-## Getting Started
+LinClaw 项目的官方落地页，基于 Next.js 构建。
 
-First, run the development server:
+## 技术栈
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+| 技术              | 版本 | 说明                             |
+| ----------------- | ---- | -------------------------------- |
+| Next.js           | 16   | 静态导出（`output: "export"`）   |
+| React             | 19   | UI 框架                          |
+| TypeScript        | 5    | 类型系统                         |
+| Tailwind CSS      | 4    | 样式                             |
+| Framer Motion     | 12   | 页面动画                         |
+| GSAP              | 3    | 卡片动画（MagicBento、CardSwap） |
+| React Three Fiber | 9    | Dither 背景（WebGL）             |
+| shadcn/ui         | —    | 基础组件                         |
+| lucide-react      | —    | 图标                             |
+
+## 目录结构
+
+```
+www/
+├── app/
+│   ├── icon.png          # 标签页图标
+│   ├── layout.tsx        # 根布局、字体、metadata
+│   ├── page.tsx          # 首页（各 section 懒加载）
+│   └── globals.css       # 全局样式 & CSS 变量
+├── components/
+│   ├── sections/         # 页面各区块
+│   │   ├── Navbar.tsx
+│   │   ├── HeroSection.tsx
+│   │   ├── FeaturesSection.tsx
+│   │   ├── TechSection.tsx
+│   │   ├── PlatformsSection.tsx
+│   │   ├── DownloadSection.tsx
+│   │   └── FooterSection.tsx
+│   ├── Dither.tsx        # WebGL 像素化背景
+│   ├── CardSwap.tsx      # 3D 卡片轮播
+│   ├── MagicBento.tsx    # 功能特性 Bento 网格
+│   └── ...               # 其他动效组件
+└── public/
+    ├── icon.png
+    └── images/           # 截图素材
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 本地开发
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+cd www
+pnpm install
+pnpm run dev      # 开发服务器 http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 构建
 
-## Learn More
+```bash
+pnpm run build    # 静态导出到 out/
+pnpm run start    # 本地预览构建产物
+```
 
-To learn more about Next.js, take a look at the following resources:
+构建输出为纯静态文件（`out/`），可直接部署到任意 CDN 或静态托管平台。
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 部署
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+由于配置了 `output: "export"`，构建产物是纯 HTML/CSS/JS，无需 Node.js 服务端：
 
-## Deploy on Vercel
+```bash
+# Vercel
+vercel deploy
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# 或直接上传 out/ 目录到任意静态托管（OSS、GitHub Pages 等）
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 相关链接
+
+- 主项目：[github.com/sunqirui1987/linx-claw](https://github.com/sunqirui1987/linx-claw)
+- Releases：[github.com/sunqirui1987/linx-claw/releases](https://github.com/sunqirui1987/linx-claw/releases)
