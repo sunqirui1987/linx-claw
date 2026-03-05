@@ -11,7 +11,8 @@ dist
 dist-electron
 logs
 node_modules
-build
+/build/*
+!/build/entitlements.mac.plist
 src/aicraw/console
 
 .DS_Store

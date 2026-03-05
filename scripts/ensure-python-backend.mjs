@@ -87,6 +87,7 @@ console.log('[python-backend] Installing console dependencies...')
 const pnpmInstall = spawnSync('pnpm', ['install', '--frozen-lockfile'], {
   cwd: consoleDir,
   stdio: 'inherit',
+  shell: true, // Windows 上 pnpm.cmd 需要 shell 解析才能找到
 })
 if (pnpmInstall.status !== 0) {
   console.error('[python-backend] Console pnpm install failed.')
@@ -97,6 +98,7 @@ console.log('[python-backend] Building console frontend...')
 const pnpmBuild = spawnSync('pnpm', ['run', 'build'], {
   cwd: consoleDir,
   stdio: 'inherit',
+  shell: true, // Windows 上 pnpm.cmd 需要 shell 解析才能找到
 })
 if (pnpmBuild.status !== 0) {
   console.error('[python-backend] Console build failed.')

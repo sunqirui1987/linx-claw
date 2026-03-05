@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import List, Optional
 
-from fastapi import APIRouter, Body, HTTPException, Path, Request
+from fastapi import APIRouter, Body, HTTPException, Path
 from pydantic import BaseModel, Field
 
 from ...providers import (
@@ -28,29 +28,6 @@ from ...providers import (
 from ...providers.model_fetcher import get_provider_models
 
 router = APIRouter(prefix="/models", tags=["models"])
-
-QNAIGC_ID = "qnaigc"
-
-
-def _get_auth_token(request: Request) -> Optional[str]:
-    """Extract Bearer token from Authorization header."""
-    auth = request.headers.get("Authorization")
-    if not auth or not auth.startswith("Bearer "):
-        return None
-    token = auth[7:].strip()
-    return token if token else None
-
-
-def _maybe_sync_login_key_to_qnaigc(request: Request) -> None:
-    """If qnaigc has no api_key and request has Authorization, persist it."""
-    token = _get_auth_token(request)
-    if not token:
-        return
-    data = load_providers_json()
-    settings = data.providers.get(QNAIGC_ID)
-    if not settings or settings.api_key:
-        return
-    update_provider_settings(QNAIGC_ID, api_key=token)
 
 
 class ProviderConfigRequest(BaseModel):
@@ -132,8 +109,7 @@ def _build_provider_info(
     response_model=List[ProviderInfo],
     summary="List all providers",
 )
-async def list_all_providers(request: Request) -> List[ProviderInfo]:
-    _maybe_sync_login_key_to_qnaigc(request)
+async def list_all_providers() -> List[ProviderInfo]:
     data = load_providers_json()
     return [_build_provider_info(p, data) for p in list_providers()]
 
@@ -254,10 +230,8 @@ async def get_active_models() -> ActiveModelsInfo:
     summary="Set active LLM",
 )
 async def set_active_model(
-    request: Request,
     body: ModelSlotRequest = Body(...),
 ) -> ActiveModelsInfo:
-    _maybe_sync_login_key_to_qnaigc(request)
     provider = get_provider(body.provider_id)
     if provider is None:
         raise HTTPException(

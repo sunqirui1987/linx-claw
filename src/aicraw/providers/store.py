@@ -27,12 +27,10 @@ from .registry import (
     validate_custom_provider_id,
 )
 
-_PROVIDERS_DIR = Path(__file__).resolve().parent
-_PROVIDERS_JSON = _PROVIDERS_DIR / "providers.json"
-
-
 def get_providers_json_path() -> Path:
-    return _PROVIDERS_JSON
+    from ..constant import WORKING_DIR
+
+    return WORKING_DIR / "providers.json"
 
 
 def _ensure_base_url(settings: ProviderSettings, defn) -> None:

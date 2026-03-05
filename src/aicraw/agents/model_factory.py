@@ -274,6 +274,9 @@ def _create_remote_model_instance(
         api_key = os.getenv("DASHSCOPE_API_KEY", "")
         base_url = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 
+    masked = (api_key[:6] + "****" + api_key[-4:]) if api_key and len(api_key) > 10 else ("****" if api_key else "")
+    logger.info("LLM request: model=%s base_url=%s api_key=%s", model_name, base_url, masked)
+
     # Instantiate model
     model = chat_model_class(
         model_name,

@@ -4,10 +4,7 @@
 
 ![LinClaw Chat](docs/image.png)
 ![LinClaw Chat](docs/image2.png)
-<<<<<<< HEAD
 ![LinClaw Chat](docs/image3.png)
-=======
->>>>>>> 2735a89b9bdcc900245334d00b3ebace86b3f644
 
 ## 环境要求
 
@@ -43,12 +40,12 @@ aicraw app
 
 无需 PyInstaller、electron-builder，直接运行源码，适合日常开发与调试。
 
-| 对比 | 开发模式 | 打包模式 |
-|------|----------|----------|
-| Python | 直接 `aicraw app` | PyInstaller 打成 exe |
-| Electron | 加载本地 `http://127.0.0.1:8088` | 内嵌打包后的 Python |
-| 输出 | 无 | `release/*.dmg` 或 `*.exe` |
-| 依赖 | 需本机安装 Python | 无需 Python |
+| 对比     | 开发模式                         | 打包模式                   |
+| -------- | -------------------------------- | -------------------------- |
+| Python   | 直接 `aicraw app`                | PyInstaller 打成 exe       |
+| Electron | 加载本地 `http://127.0.0.1:8088` | 内嵌打包后的 Python        |
+| 输出     | 无                               | `release/*.dmg` 或 `*.exe` |
+| 依赖     | 需本机安装 Python                | 无需 Python                |
 
 ```bash
 # 终端 1：启动 Python 后端
@@ -93,9 +90,9 @@ pnpm run build:electron:win   # Windows
 
 ### 输出文件
 
-| 平台 | 输出路径 |
-|------|----------|
-| macOS | `release/LinClaw-<版本>-universal.dmg`（universal 安装包，支持 Intel 与 Apple Silicon） |
+| 平台    | 输出路径                                                                                        |
+| ------- | ----------------------------------------------------------------------------------------------- |
+| macOS   | `release/LinClaw-<版本>-universal.dmg`（universal 安装包，支持 Intel 与 Apple Silicon）         |
 | Windows | `release/LinClaw Setup <版本>.exe`（安装程序）、`release/LinClaw <版本> Portable.exe`（便携版） |
 
 ### 窗口拖拽（macOS）
@@ -116,14 +113,14 @@ Electron 客户端顶部 header 区域支持拖拽移动窗口，按钮等交互
 rm -rf release python-dist .build-venv dist dist-electron build console/dist
 ```
 
-| 目录 | 说明 |
-|------|------|
-| `release/` | Electron 打包输出 |
-| `python-dist/` | PyInstaller 生成的 Python 可执行文件 |
-| `.build-venv/` | 构建用 Python 虚拟环境 |
-| `dist`、`dist-electron` | Vite 构建输出 |
-| `build/` | 图标等构建资源 |
-| `console/dist` | 控制台前端构建输出 |
+| 目录                    | 说明                                 |
+| ----------------------- | ------------------------------------ |
+| `release/`              | Electron 打包输出                    |
+| `python-dist/`          | PyInstaller 生成的 Python 可执行文件 |
+| `.build-venv/`          | 构建用 Python 虚拟环境               |
+| `dist`、`dist-electron` | Vite 构建输出                        |
+| `build/`                | 图标等构建资源                       |
+| `console/dist`          | 控制台前端构建输出                   |
 
 ---
 

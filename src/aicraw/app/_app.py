@@ -51,6 +51,23 @@ agent_app = AgentApp(
 async def lifespan(app: FastAPI):  # pylint: disable=too-many-statements
     await runner.start()
 
+    # --- Validate stored qnaigc api_key on startup ---
+    try:
+        from ..providers import load_providers_json, update_provider_settings
+        from .routers.auth import _validate_qnaigc_api_key
+
+        _data = load_providers_json()
+        _settings = _data.providers.get("qnaigc")
+        if _settings and _settings.api_key:
+            _valid = await _validate_qnaigc_api_key(_settings.api_key)
+            if not _valid:
+                logger.warning(
+                    "Stored qnaigc api_key is invalid, clearing it to force re-login"
+                )
+                update_provider_settings("qnaigc", api_key="")
+    except Exception:
+        logger.exception("Failed to validate qnaigc api_key on startup")
+
     # --- MCP client manager init (independent module, hot-reloadable) ---
     config = load_config()
     mcp_manager = MCPClientManager()

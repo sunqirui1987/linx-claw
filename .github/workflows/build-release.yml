@@ -1,0 +1,236 @@
+name: Build & Release
+
+# 触发条件：
+#   - 推送版本标签 (v*.*.*)  → 构建全平台 + 创建 GitHub Release
+#   - 手动触发              → 构建全平台（可选是否发布为草稿）
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      draft:
+        description: '发布为草稿 Release'
+        type: boolean
+        default: true
+
+# 创建 GitHub Release 需要写权限
+permissions:
+  contents: write
+
+# 同一 ref 有新触发时取消旧任务，节省 CI 用量
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PNPM_VERSION: '9.15.0'   # 与 console/package.json packageManager 字段保持一致
+  NODE_VERSION: '20'
+  PYTHON_VERSION: '3.12'   # pyproject.toml 要求 >=3.10,<3.15，优先使用 3.12
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 重要：PyInstaller 不支持交叉编译，每个平台的 job 必须在原生 runner 上运行，
+# 确保 Python 二进制文件的架构与目标平台一致。
+#
+#   macos-latest   = macOS 15 Apple Silicon (ARM64) → LinClaw（ARM64 Mach-O）
+#   macos-13       = macOS 13 Intel (x64)           → LinClaw（x64 Mach-O）
+#   windows-latest = Windows Server x64             → LinClaw.exe
+# ─────────────────────────────────────────────────────────────────────────────
+
+jobs:
+  # ─── macOS ARM64（Apple Silicon）─────────────────────────────────────────
+  build-mac-arm64:
+    name: macOS ARM64
+    runs-on: macos-latest   # 当前为 macos-15，Apple Silicon
+    steps:
+      - uses: actions/checkout@v4
+
+      # 安装 Python 3.12，供 PyInstaller 使用；pip 下载缓存按 pyproject.toml 哈希
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # 缓存 pnpm 内容寻址存储（同时覆盖根目录和 console 的依赖）
+      - name: 获取 pnpm store 路径
+        id: pnpm-store
+        run: echo "path=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: ${{ runner.os }}-${{ runner.arch }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-${{ runner.arch }}-pnpm-
+
+      - name: 安装根目录依赖
+        run: pnpm install --frozen-lockfile
+
+      # 第一步：PyInstaller 打包 Python 后端（内部同时构建 console 前端）
+      # 输出：python-dist/LinClaw/LinClaw（ARM64 Mach-O）
+      - name: 构建 Python 后端
+        run: pnpm run build:python
+
+      # 第二步：electron-builder 打包 macOS ARM64 安装包
+      # 需要在仓库 Settings → Secrets 中配置以下密钥：
+      #   APPLE_CERT_P12_BASE64  – base64 编码的 Developer ID .p12 证书
+      #   APPLE_CERT_PASSWORD    – .p12 密码
+      #   APPLE_ID               – 用于公证的 Apple ID 邮箱
+      #   APPLE_APP_PASSWORD     – 该 Apple ID 的专用密码
+      #   APPLE_TEAM_ID          – Apple 开发者团队 ID
+      - name: 构建 Electron 应用（macOS ARM64）
+        env:
+          CSC_LINK: ${{ secrets.APPLE_CERT_P12_BASE64 }}
+          CSC_KEY_PASSWORD: ${{ secrets.APPLE_CERT_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pnpm run build:electron:mac:arm64
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mac-arm64
+          path: release/*.dmg
+          if-no-files-found: error
+
+  # ─── macOS x64（Intel）───────────────────────────────────────────────────
+  build-mac-x64:
+    name: macOS x64 (Intel)
+    runs-on: macos-15-intel  # Intel x86_64（macos-13 退役后的官方替代标签）
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 获取 pnpm store 路径
+        id: pnpm-store
+        run: echo "path=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: ${{ runner.os }}-${{ runner.arch }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-${{ runner.arch }}-pnpm-
+
+      - name: 安装根目录依赖
+        run: pnpm install --frozen-lockfile
+
+      # 输出：python-dist/LinClaw/LinClaw（x64 Mach-O）
+      - name: 构建 Python 后端
+        run: pnpm run build:python
+
+      - name: 构建 Electron 应用（macOS x64）
+        env:
+          CSC_LINK: ${{ secrets.APPLE_CERT_P12_BASE64 }}
+          CSC_KEY_PASSWORD: ${{ secrets.APPLE_CERT_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pnpm run build:electron:mac:x64
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mac-x64
+          path: release/*.dmg
+          if-no-files-found: error
+
+  # ─── Windows x64 ─────────────────────────────────────────────────────────
+  build-win-x64:
+    name: Windows x64
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Windows 默认 shell 为 PowerShell，此步骤需用 bash 语法写入 GITHUB_OUTPUT
+      - name: 获取 pnpm store 路径
+        id: pnpm-store
+        shell: bash
+        run: echo "path=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: ${{ runner.os }}-${{ runner.arch }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-${{ runner.arch }}-pnpm-
+
+      - name: 安装根目录依赖
+        run: pnpm install --frozen-lockfile
+
+      # 输出：python-dist/LinClaw/LinClaw.exe（Windows x64 PE）
+      - name: 构建 Python 后端
+        run: pnpm run build:python
+
+      # 同时生成 NSIS 安装包（LinClaw Setup *.exe）和便携版（LinClaw *.exe）
+      - name: 构建 Electron 应用（Windows x64）
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pnpm run build:electron:win
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-x64
+          # 只上传安装包/便携版 EXE，排除 win-unpacked 目录
+          path: release/*.exe
+          if-no-files-found: error
+
+  # ─── 发布 GitHub Release ──────────────────────────────────────────────────
+  # 仅在推送版本标签（v*.*.*）时运行，汇聚三个平台的产物并创建 Release。
+  release:
+    name: 发布 Release
+    needs: [build-mac-arm64, build-mac-x64, build-win-x64]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: 列出待发布文件
+        run: find artifacts -type f | sort
+
+      - name: 创建 GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          # 手动触发且勾选草稿时为 true；tag 推送时默认直接发布
+          draft: ${{ github.event_name == 'workflow_dispatch' && inputs.draft == true }}
+          generate_release_notes: true
+          files: |
+            artifacts/mac-arm64/*.dmg
+            artifacts/mac-x64/*.dmg
+            artifacts/windows-x64/*.exe

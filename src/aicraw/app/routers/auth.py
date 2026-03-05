@@ -96,4 +96,10 @@ async def login(body: LoginRequest) -> dict[str, Any]:
     if not valid:
         raise HTTPException(status_code=401, detail="API Key 无效或验证失败")
 
+    try:
+        from ...providers import update_provider_settings
+        update_provider_settings("qnaigc", api_key=api_key)
+    except Exception:
+        logger.warning("Failed to sync api_key to providers on login", exc_info=True)
+
     return {"success": True, "error": None}
