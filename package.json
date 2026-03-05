@@ -38,6 +38,7 @@
     "productName": "LinClaw",
     "copyright": "Copyright © 2025 LinClaw",
     "directories": {
+      "app": ".",
       "output": "release",
       "buildResources": "build"
     },
