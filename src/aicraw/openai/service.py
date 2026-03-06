@@ -3,11 +3,15 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import time
 import uuid
 from typing import Any, AsyncIterator, Optional
+
+# 当前 OpenAI 流式任务，新请求到来时取消上一个，保证永远只有一个实例
+_openai_stream_task: Optional[asyncio.Task] = None
 
 from agentscope_runtime.engine.schemas.agent_schemas import (
     AgentRequest,
@@ -129,7 +133,8 @@ async def run_chat_completion(
     if not input_msgs:
         return "", None
 
-    session_id = f"openai-{uuid.uuid4().hex[:16]}"
+    # 固定 session_id，保证永远只有一个 OpenAI 实例，新请求可打断上一个
+    session_id = "openai"
     req = AgentRequest(
         session_id=session_id,
         user_id="openai",
@@ -164,6 +169,18 @@ async def run_chat_completion(
     return full_text, usage
 
 
+async def cancel_previous_openai_stream() -> None:
+    """取消上一个 OpenAI 流式任务，保证新请求可打断上一个。"""
+    global _openai_stream_task
+    if _openai_stream_task is not None and not _openai_stream_task.done():
+        _openai_stream_task.cancel()
+        try:
+            await _openai_stream_task
+        except asyncio.CancelledError:
+            pass
+        _openai_stream_task = None
+
+
 async def stream_chat_completion(
     runner: Any,
     request_body: dict,
@@ -171,107 +188,118 @@ async def stream_chat_completion(
     """
     Stream chat completion via runner.stream_query.
     Yields OpenAI SSE chunks as each agent message completes (true streaming).
+    使用固定 session_id=openai，新请求会取消上一个，保证永远只有一个实例。
     """
-    messages = request_body.get("messages", [])
-    if not messages:
-        return
+    global _openai_stream_task
+    _openai_stream_task = asyncio.current_task()
+    try:
+        messages = request_body.get("messages", [])
+        if not messages:
+            return
 
-    last_user_content = ""
-    for m in reversed(messages):
-        if _get_role(m) == "user":
-            last_user_content = _content_to_text(_get_content(m))
-            break
-    if not last_user_content:
-        return
-    session_id = f"openai-{uuid.uuid4().hex[:16]}"
-    # Match /api/agent/process request format exactly for same streaming behavior
-    req_dict = {
-        "input": [
-            {
-                "role": "user",
-                "type": "message",
-                "content": [{"type": "text", "text": last_user_content}],
+        last_user_content = ""
+        for m in reversed(messages):
+            if _get_role(m) == "user":
+                last_user_content = _content_to_text(_get_content(m))
+                break
+        if not last_user_content:
+            return
+        # 固定 session_id，保证永远只有一个 OpenAI 实例，新请求可打断上一个
+        session_id = "openai"
+        # Match /api/agent/process request format exactly for same streaming behavior
+        req_dict = {
+            "input": [
+                {
+                    "role": "user",
+                    "type": "message",
+                    "content": [{"type": "text", "text": last_user_content}],
+                }
+            ],
+            "session_id": session_id,
+            "user_id": "default",
+            "channel": "console",
+            "stream": True,
+        }
+
+        chunk_id = f"chatcmpl-{uuid.uuid4().hex[:24]}"
+        created = int(time.time())
+
+        def _make_chunk(delta: dict):
+            return {
+                "id": chunk_id,
+                "object": "chat.completion.chunk",
+                "created": created,
+                "model": "",
+                "choices": [{"index": 0, "delta": delta, "finish_reason": None}],
             }
-        ],
-        "session_id": session_id,
-        "user_id": "default",
-        "channel": "console",
-        "stream": True,
-    }
 
-    chunk_id = f"chatcmpl-{uuid.uuid4().hex[:24]}"
-    created = int(time.time())
+        def _chunk_text(text: str, chunk_size: int = 32) -> list[str]:
+            """Split text into small chunks for simulated streaming when agent returns full text."""
+            if not text:
+                return []
+            chunks = []
+            for i in range(0, len(text), chunk_size):
+                chunks.append(text[i : i + chunk_size])
+            return chunks
 
-    def _make_chunk(delta: dict):
-        return {
+        # First chunk: role assistant (OpenAI stream format)
+        yield f"data: {json.dumps(_make_chunk({'role': 'assistant', 'content': ''}), ensure_ascii=False)}\n\n"
+
+        streamed_msg_ids: set = set()  # avoid duplicate: skip message.completed if we streamed content
+        streamed_any = False  # avoid duplicate: skip response if we already streamed from message/content
+
+        async for event in runner.stream_query(req_dict):
+            obj = getattr(event, "object", None)
+            status = getattr(event, "status", None)
+
+            # Stream text deltas from content events (same as /api/agent/process)
+            if obj == "content":
+                content_type = getattr(event, "type", None)
+                if content_type == ContentType.TEXT:
+                    text = getattr(event, "text", None) or ""
+                    if text:
+                        streamed_any = True
+                        msg_id = getattr(event, "msg_id", None)
+                        if msg_id:
+                            streamed_msg_ids.add(msg_id)
+                        yield f"data: {json.dumps(_make_chunk({'content': text}), ensure_ascii=False)}\n\n"
+            elif obj == "message" and status == RunStatus.Completed:
+                if streamed_any:  # 已从 content 流式输出，跳过避免重复
+                    continue
+                msg_id = getattr(event, "id", None)
+                if msg_id and msg_id in streamed_msg_ids:
+                    continue
+                text = _extract_text_from_message(event)
+                if text:
+                    streamed_any = True
+                    for piece in _chunk_text(text):
+                        yield f"data: {json.dumps(_make_chunk({'content': piece}), ensure_ascii=False)}\n\n"
+            elif obj == "response" and not streamed_any:
+                text = _extract_text_from_response(event)
+                if text:
+                    streamed_any = True  # 标记已输出，防止后续重复
+                    for piece in _chunk_text(text):
+                        yield f"data: {json.dumps(_make_chunk({'content': piece}), ensure_ascii=False)}\n\n"
+
+        # Final chunk with finish_reason
+        final_chunk = {
             "id": chunk_id,
             "object": "chat.completion.chunk",
             "created": created,
             "model": "",
-            "choices": [{"index": 0, "delta": delta, "finish_reason": None}],
+            "choices": [
+                {
+                    "index": 0,
+                    "delta": {},
+                    "finish_reason": "stop",
+                }
+            ],
         }
-
-    def _chunk_text(text: str, chunk_size: int = 32) -> list[str]:
-        """Split text into small chunks for simulated streaming when agent returns full text."""
-        if not text:
-            return []
-        chunks = []
-        for i in range(0, len(text), chunk_size):
-            chunks.append(text[i : i + chunk_size])
-        return chunks
-
-    # First chunk: role assistant (OpenAI stream format)
-    yield f"data: {json.dumps(_make_chunk({'role': 'assistant', 'content': ''}), ensure_ascii=False)}\n\n"
-
-    streamed_msg_ids: set = set()  # avoid duplicate: skip message.completed if we streamed content
-    streamed_any = False  # avoid duplicate: skip response if we already streamed from message/content
-
-    async for event in runner.stream_query(req_dict):
-        obj = getattr(event, "object", None)
-        status = getattr(event, "status", None)
-
-        # Stream text deltas from content events (same as /api/agent/process)
-        if obj == "content":
-            content_type = getattr(event, "type", None)
-            if content_type == ContentType.TEXT:
-                text = getattr(event, "text", None) or ""
-                if text:
-                    streamed_any = True
-                    msg_id = getattr(event, "msg_id", None)
-                    if msg_id:
-                        streamed_msg_ids.add(msg_id)
-                    yield f"data: {json.dumps(_make_chunk({'content': text}), ensure_ascii=False)}\n\n"
-        elif obj == "message" and status == RunStatus.Completed:
-            msg_id = getattr(event, "id", None)
-            if msg_id and msg_id in streamed_msg_ids:
-                continue
-            text = _extract_text_from_message(event)
-            if text:
-                streamed_any = True
-                for piece in _chunk_text(text):
-                    yield f"data: {json.dumps(_make_chunk({'content': piece}), ensure_ascii=False)}\n\n"
-        elif obj == "response" and not streamed_any:
-            text = _extract_text_from_response(event)
-            if text:
-                for piece in _chunk_text(text):
-                    yield f"data: {json.dumps(_make_chunk({'content': piece}), ensure_ascii=False)}\n\n"
-
-    # Final chunk with finish_reason
-    final_chunk = {
-        "id": chunk_id,
-        "object": "chat.completion.chunk",
-        "created": created,
-        "model": "",
-        "choices": [
-            {
-                "index": 0,
-                "delta": {},
-                "finish_reason": "stop",
-            }
-        ],
-    }
-    yield f"data: {json.dumps(final_chunk, ensure_ascii=False)}\n\n"
-    yield "data: [DONE]\n\n"
+        yield f"data: {json.dumps(final_chunk, ensure_ascii=False)}\n\n"
+        yield "data: [DONE]\n\n"
+    finally:
+        if _openai_stream_task is asyncio.current_task():
+            _openai_stream_task = None
 
 
 def build_openai_response(

@@ -13,6 +13,7 @@ from .service import (
     run_chat_completion,
     stream_chat_completion,
     build_openai_response,
+    cancel_previous_openai_stream,
 )
 
 router = APIRouter(tags=["openai"])
@@ -82,6 +83,8 @@ async def chat_completions(request: Request, body: ChatCompletionRequest):
 
     try:
         if stream:
+            # 新请求到来时取消上一个流式任务，保证永远只有一个 OpenAI 实例
+            await cancel_previous_openai_stream()
             return StreamingResponse(
                 stream_chat_completion(runner, body_dict),
                 media_type="text/event-stream",

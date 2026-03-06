@@ -1,13 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
   Card,
   Button,
   Input,
   message,
-  Switch,
   Form,
 } from "@agentscope-ai/design";
-import { Space, Typography } from "antd";
+import { Typography } from "antd";
 import { useTranslation } from "react-i18next";
 import api from "../../../api";
 import styles from "./index.module.less";
@@ -41,13 +40,21 @@ function ServiceCapabilitiesPage() {
     show_tool_details?: boolean;
     language?: string;
   } | null>(null);
-  const [demoInput, setDemoInput] = useState("你好，请简单介绍一下自己");
-  const [demoOutput, setDemoOutput] = useState("");
-  const [demoLoading, setDemoLoading] = useState(false);
-  const [streamMode, setStreamMode] = useState(true);
+  const [demoApiKey, setDemoApiKey] = useState("");
+  const [demoMessages, setDemoMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
+  const [demoInput, setDemoInput] = useState("");
   const [copied, setCopied] = useState<string | null>(null);
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
-  const chatUrl = baseUrl ? `${baseUrl}/v1/chat/completions` : "";
+  // 开发时用相对路径走 Vite 代理，避免跨域
+  const isDevProxy =
+    typeof window !== "undefined" &&
+    (window.location.origin.includes(":5174") || window.location.origin.includes(":5173"));
+  const chatUrl = baseUrl
+    ? isDevProxy
+      ? "/v1/chat/completions"
+      : `${baseUrl}/v1/chat/completions`
+    : "";
 
   useEffect(() => {
     api
@@ -60,7 +67,9 @@ function ServiceCapabilitiesPage() {
     api
       .getDefaultsConfig()
       .then((config) => {
-        setApiKey(config?.openai_api_key ?? "");
+        const key = config?.openai_api_key ?? "";
+        setApiKey(key);
+        setDemoApiKey(key);
         setDefaultsConfig({
           heartbeat: config?.heartbeat ?? undefined,
           show_tool_details: config?.show_tool_details ?? true,
@@ -99,8 +108,18 @@ function ServiceCapabilitiesPage() {
     }
   };
 
+  const scrollToBottom = useCallback(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [demoMessages, scrollToBottom]);
+
   const handleDemo = async () => {
-    if (!apiKey) {
+    const text = demoInput.trim();
+    if (!text) return;
+    if (!demoApiKey) {
       message.warning(t("serviceCapabilities.apiKeyRequired"));
       return;
     }
@@ -108,27 +127,45 @@ function ServiceCapabilitiesPage() {
       message.warning(t("serviceCapabilities.serverUrlRequired"));
       return;
     }
-    setDemoLoading(true);
-    setDemoOutput("");
+
+    setDemoInput("");
+    let assistantIndex = -1;
+    setDemoMessages((prev) => {
+      const userMsg = { role: "user" as const, content: text };
+      const assistantPlaceholder = { role: "assistant" as const, content: "" };
+      assistantIndex = prev.length + 1;
+      return [...prev, userMsg, assistantPlaceholder];
+    });
+
     try {
       const body = {
-        messages: [{ role: "user", content: demoInput }],
-        stream: streamMode,
+        messages: [
+          ...demoMessages.map((m) => ({ role: m.role, content: m.content })),
+          { role: "user", content: text },
+        ],
+        stream: true,
       };
       const res = await fetch(chatUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
+          Authorization: `Bearer ${demoApiKey}`,
         },
         body: JSON.stringify(body),
       });
       if (!res.ok) {
         const err = await res.text();
-        setDemoOutput(`Error ${res.status}: ${err}`);
+        const idx = assistantIndex;
+        setDemoMessages((prev) => {
+          const next = [...prev];
+          if (idx >= 0 && idx < next.length) {
+            next[idx] = { role: "assistant", content: `Error ${res.status}: ${err}` };
+          }
+          return next;
+        });
         return;
       }
-      if (streamMode && res.body) {
+      if (res.body) {
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
         let full = "";
@@ -138,36 +175,46 @@ function ServiceCapabilitiesPage() {
           const chunk = decoder.decode(value, { stream: true });
           const lines = chunk.split("\n").filter((l) => l.startsWith("data: "));
           for (const line of lines) {
-            const data = line.slice(6);
-            if (data === "[DONE]") continue;
+            const data = line.slice(6).trim();
+            if (!data || data === "[DONE]") continue;
             try {
               const obj = JSON.parse(data);
               const content = obj?.choices?.[0]?.delta?.content;
               if (content) {
                 full += content;
-                setDemoOutput(full);
+                const idx = assistantIndex;
+                setDemoMessages((prev) => {
+                  const next = [...prev];
+                  if (idx >= 0 && idx < next.length) {
+                    next[idx] = { role: "assistant", content: full };
+                  }
+                  return next;
+                });
               }
             } catch {
               // skip invalid json
             }
           }
         }
-      } else {
-        const json = await res.json();
-        const content = json?.choices?.[0]?.message?.content ?? "";
-        setDemoOutput(content || JSON.stringify(json, null, 2));
       }
     } catch (err) {
-      setDemoOutput(
-        err instanceof Error ? err.message : String(err)
-      );
-    } finally {
-      setDemoLoading(false);
+      const idx = assistantIndex;
+      setDemoMessages((prev) => {
+        const next = [...prev];
+        if (idx >= 0 && idx < next.length) {
+          next[idx] = {
+            role: "assistant",
+            content: err instanceof Error ? err.message : String(err),
+          };
+        }
+        return next;
+      });
     }
   };
 
-  const curlExample = chatUrl
-    ? `curl -X POST '${chatUrl}' \\
+  const curlChatUrl = baseUrl ? `${baseUrl}/v1/chat/completions` : "";
+  const curlExample = curlChatUrl
+    ? `curl -X POST '${curlChatUrl}' \\
   -H 'Authorization: Bearer <API_KEY>' \\
   -H 'Content-Type: application/json' \\
   -d '{"messages":[{"role":"user","content":"你好"}],"stream":true}'`
@@ -367,46 +414,71 @@ function ServiceCapabilitiesPage() {
       </Card>
 
       <Card className={styles.card} title={t("serviceCapabilities.demo")}>
+        <p className={styles.hint}>{t("serviceCapabilities.demoDesc")}</p>
         <div className={styles.section}>
           <Typography.Text strong>
-            {t("serviceCapabilities.demoInput")}
+            {t("serviceCapabilities.demoApiKeyLabel")}
           </Typography.Text>
-          <Input.TextArea
-            value={demoInput}
-            onChange={(e) => setDemoInput(e.target.value)}
-            placeholder={t("serviceCapabilities.demoInputPlaceholder")}
-            rows={3}
-            className={styles.textArea}
+          <Input.Password
+            value={demoApiKey}
+            onChange={(e) => setDemoApiKey(e.target.value)}
+            placeholder={t("serviceCapabilities.demoApiKeyPlaceholder")}
+            autoComplete="off"
+            className={styles.demoApiKeyInput}
           />
         </div>
-        <div className={styles.section}>
-          <Space>
-            <Typography.Text strong>
-              {t("serviceCapabilities.streamMode")}
-            </Typography.Text>
-            <Switch
-              checked={streamMode}
-              onChange={setStreamMode}
-            />
-          </Space>
-        </div>
-        <div className={styles.section}>
-          <Button
-            type="primary"
-            onClick={handleDemo}
-            loading={demoLoading}
-          >
-            {t("serviceCapabilities.send")}
-          </Button>
-        </div>
-        {demoOutput && (
-          <div className={styles.section}>
-            <Typography.Text strong>
-              {t("serviceCapabilities.demoOutput")}
-            </Typography.Text>
-            <pre className={styles.output}>{demoOutput}</pre>
+        <div className={styles.demoChatWrap}>
+          <div className={styles.demoChatArea}>
+            {demoMessages.length === 0 ? (
+              <div className={styles.demoChatEmpty}>
+                {t("serviceCapabilities.demoInputPlaceholder")}
+              </div>
+            ) : (
+              demoMessages.map((msg, i) => (
+                <div
+                  key={i}
+                  className={
+                    msg.role === "user"
+                      ? styles.demoMsgUser
+                      : styles.demoMsgAssistant
+                  }
+                >
+                  <span className={styles.demoMsgRole}>
+                    {msg.role === "user"
+                      ? t("serviceCapabilities.demoRoleUser")
+                      : t("serviceCapabilities.demoRoleAssistant")}
+                  </span>
+                  <div className={styles.demoMsgContent}>
+                    {msg.content || ""}
+                  </div>
+                </div>
+              ))
+            )}
+            <div ref={chatEndRef} />
           </div>
-        )}
+          <div className={styles.demoChatFooter}>
+            <Input.TextArea
+              value={demoInput}
+              onChange={(e) => setDemoInput(e.target.value)}
+              placeholder={t("serviceCapabilities.demoInputPlaceholder")}
+              rows={2}
+              className={styles.demoInput}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleDemo();
+                }
+              }}
+            />
+            <Button
+              type="primary"
+              onClick={handleDemo}
+              className={styles.demoSendBtn}
+            >
+              {t("serviceCapabilities.send")}
+            </Button>
+          </div>
+        </div>
       </Card>
     </div>
   );
