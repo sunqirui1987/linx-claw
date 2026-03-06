@@ -245,8 +245,9 @@ async def stream_chat_completion(
         # First chunk: role assistant (OpenAI stream format)
         yield f"data: {json.dumps(_make_chunk({'role': 'assistant', 'content': ''}), ensure_ascii=False)}\n\n"
 
-        streamed_msg_ids: set = set()  # avoid duplicate: skip message.completed if we streamed content
-        streamed_any = False  # avoid duplicate: skip response if we already streamed from message/content
+        # Lock streaming to a single text source to avoid mixing deltas with
+        # fallback full-message events.
+        stream_source: Optional[str] = None
 
         async for event in runner.stream_query(req_dict):
             obj = getattr(event, "object", None)
@@ -255,29 +256,45 @@ async def stream_chat_completion(
             # Stream text deltas from content events (same as /api/agent/process)
             if obj == "content":
                 content_type = getattr(event, "type", None)
-                if content_type == ContentType.TEXT:
-                    text = getattr(event, "text", None) or ""
-                    if text:
-                        streamed_any = True
-                        msg_id = getattr(event, "msg_id", None)
-                        if msg_id:
-                            streamed_msg_ids.add(msg_id)
-                        yield f"data: {json.dumps(_make_chunk({'content': text}), ensure_ascii=False)}\n\n"
-            elif obj == "message" and status == RunStatus.Completed:
-                if streamed_any:  # 已从 content 流式输出，跳过避免重复
+                if content_type != ContentType.TEXT:
                     continue
-                msg_id = getattr(event, "id", None)
-                if msg_id and msg_id in streamed_msg_ids:
+
+                text = getattr(event, "text", None) or ""
+                if not text:
+                    continue
+
+                # AgentScope may emit both incremental text deltas and a final
+                # completed content snapshot for the same message.
+                is_incremental = (
+                    getattr(event, "delta", None) is True
+                    or status == RunStatus.InProgress
+                )
+                if is_incremental:
+                    if stream_source not in (None, "content"):
+                        continue
+                    stream_source = "content"
+                    yield f"data: {json.dumps(_make_chunk({'content': text}), ensure_ascii=False)}\n\n"
+                    continue
+
+                if stream_source is not None:
+                    continue
+                stream_source = "content"
+                for piece in _chunk_text(text):
+                    yield f"data: {json.dumps(_make_chunk({'content': piece}), ensure_ascii=False)}\n\n"
+            elif obj == "message" and status == RunStatus.Completed:
+                if stream_source is not None:
                     continue
                 text = _extract_text_from_message(event)
                 if text:
-                    streamed_any = True
+                    stream_source = "message"
                     for piece in _chunk_text(text):
                         yield f"data: {json.dumps(_make_chunk({'content': piece}), ensure_ascii=False)}\n\n"
-            elif obj == "response" and not streamed_any:
+            elif obj == "response":
+                if stream_source is not None:
+                    continue
                 text = _extract_text_from_response(event)
                 if text:
-                    streamed_any = True  # 标记已输出，防止后续重复
+                    stream_source = "response"
                     for piece in _chunk_text(text):
                         yield f"data: {json.dumps(_make_chunk({'content': piece}), ensure_ascii=False)}\n\n"
 
