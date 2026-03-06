@@ -34,7 +34,7 @@ aicraw app
 
 ## Electron 桌面客户端
 
-参考 [qiniu-aistudio](https://github.com/qiniu/qiniu-aistudio) 结构，提供 Electron 客户端，内嵌打包后的 Python 后端。打包后的应用为**独立可执行文件**，无需安装 Python 即可运行。
+参考 [qiniu-aistudio](https://github.com/qbox/qiniu-aistudio) 结构，提供 Electron 客户端，内嵌打包后的 Python 后端。打包后的应用为**独立可执行文件**，无需安装 Python 即可运行。
 
 ### 开发/调试模式（不打包）
 
