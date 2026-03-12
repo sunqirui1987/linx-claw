@@ -83,7 +83,7 @@ export default function Navbar() {
             </nav>
 
             {/* Desktop CTA */}
-            <div className="hidden md:flex items-center gap-3">
+            <div className="hidden md:flex items-center">
               <a
                 href="https://github.com/sunqirui1987/linx-claw"
                 target="_blank"
@@ -91,15 +91,6 @@ export default function Navbar() {
                 className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200"
               >
                 <Github className="w-5 h-5" />
-              </a>
-              <a
-                href="https://github.com/sunqirui1987/linx-claw/releases"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-4 py-2 rounded-lg border-1 text-white text-sm font-medium transition-all duration-200 hover:shadow-lg"
-              >
-                <Download className="w-4 h-4" />
-                <span>立即开始</span>
               </a>
             </div>
 
@@ -161,16 +152,6 @@ export default function Navbar() {
                     >
                       <Github className="w-5 h-5" />
                       <span>GitHub</span>
-                    </a>
-                    <a
-                      href="https://github.com/sunqirui1987/linx-claw/releases"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-400 hover:to-indigo-400 text-white font-medium transition-all duration-200"
-                    >
-                      <Download className="w-4 h-4" />
-                      <span>立即开始</span>
                     </a>
                   </div>
                 </nav>

@@ -3,21 +3,20 @@
 import { motion } from "framer-motion"
 import { Apple, Monitor, Package } from "lucide-react"
 import SpotlightCard from "@/components/SpotlightCard"
-import StarBorder from "@/components/StarBorder"
 import ShinyText from "@/components/ShinyText"
 
 const downloadOptions = [
   {
     icon: Apple,
     title: "macOS",
-    description: "支持 Intel 和 Apple Silicon",
+    description: "MacOS 14+，支持 Intel 和 Apple Silicon",
     format: "DMG 安装包",
     color: "from-gray-700 to-gray-800",
   },
   {
     icon: Monitor,
     title: "Windows",
-    description: "Windows 10/11 64位",
+    description: "Windows 10+ 64位",
     format: "EXE 安装包",
     color: "from-blue-700 to-blue-800",
   },
@@ -74,7 +73,7 @@ export default function DownloadSection() {
                 spotlightColor="rgba(99, 102, 241, 0.2)"
               >
                 <div
-                  className={`w-12 h-12 rounded-xl bg-gradient-to-br ${option.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}
+                  className={`w-12 h-12 rounded-xl bg-linear-to-br ${option.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}
                 >
                   <option.icon className="w-6 h-6 text-white" />
                 </div>

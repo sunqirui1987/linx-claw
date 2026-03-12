@@ -28,7 +28,7 @@ export default function HeroSection() {
           mouseRadius={1}
         />
         {/* Dark overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f]/60 via-[#0a0a0f]/40 to-[#0a0a0f]/80 pointer-events-none" />
+        <div className="absolute inset-0 bg-linear-to-b from-[#0a0a0f]/60 via-[#0a0a0f]/40 to-[#0a0a0f]/80 pointer-events-none" />
       </div>
 
       {/* Main content */}
@@ -91,7 +91,7 @@ export default function HeroSection() {
             >
               <StarBorder
                 as="a"
-                href="https://github.com/sunqirui1987/linx-claw/releases"
+                href="#download"
                 className="cursor-pointer"
                 color="#6366f1"
                 speed="6s"
@@ -130,7 +130,7 @@ export default function HeroSection() {
                 pauseOnHover={true}
                 easing="elastic"
                 skewAmount={4}
-                className="relative perspective-[1200px] translate-y-12"
+                className="relative perspective-distant translate-y-12"
               >
                 <Card customClass="overflow-hidden rounded-2xl shadow-2xl ring-1 ring-white/10">
                   <Image
@@ -190,7 +190,7 @@ export default function HeroSection() {
       </div>
 
       {/* Bottom gradient fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0a0a0f] to-transparent z-20 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-[#0a0a0f] to-transparent z-20 pointer-events-none" />
     </section>
   )
 }
